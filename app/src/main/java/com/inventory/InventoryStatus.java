@@ -5,11 +5,13 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.List;
 
 import javax.swing.AbstractListModel;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -27,71 +29,102 @@ class PathStatusItem extends JLabel implements ListCellRenderer<TransferRequest>
 	@Override
 	public Component getListCellRendererComponent(JList<? extends TransferRequest> list, TransferRequest value,
 			int index, boolean isSelected, boolean cellHasFocus) {
+		setToolTipText(value.id);
 		return this;
 	}
 }
 
 class PathStatusModel extends AbstractListModel<TransferRequest> {
 	List<TransferRequest> list;
-	public PathStatusModel(List<TransferRequest> l) {
+	boolean right;
+	public PathStatusModel(List<TransferRequest> l, boolean r) {
 		list = l;
+		right = r;
 	}
 
 	@Override
 	public int getSize() {
-		// TODO Auto-generated method stub
 		return list.size();
 	}
 
 	@Override
 	public TransferRequest getElementAt(int index) {
-		return list.get(index);
+		return list.get(right ? list.size() - index -1 : index);
+	}
+	
+	public void setList(List<TransferRequest> l) {
+		list = l;
+		fireContentsChanged(list, getSize(), getSize());
 	}
 	
 }
-class PathStatus extends JList<TransferRequest> {
+class PathStatus extends JPanel {
 	Image icon;
 	PathStatusModel requestsModel;
+	JList<TransferRequest> listView;
+	boolean right;
 
-	public PathStatus(String ic, List<TransferRequest> l) {
+	public PathStatus(String ic, List<TransferRequest> l, boolean r) {
 		super();
-		requestsModel = new PathStatusModel(l);
-//		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+		requestsModel = new PathStatusModel(l, r);
+		setMaximumSize(new Dimension(2000, 50));
+		setLayout(new BorderLayout());
 		Image image = new ImageIcon(getClass().getResource(ic)).getImage();
 		icon = image.getScaledInstance(25, 25,  java.awt.Image.SCALE_SMOOTH); // scale it smoothly  
 		PathStatusItem renderer = new PathStatusItem(icon);
-		setCellRenderer(renderer);
-		setModel(requestsModel);
-		setLayoutOrientation(JList.HORIZONTAL_WRAP);
-		setVisibleRowCount(1);
+		listView = new JList<TransferRequest>();
+		listView.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+		listView.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		listView.setCellRenderer(renderer);
+		listView.setModel(requestsModel);
+		listView.setVisibleRowCount(1);
+		listView.setBackground(getBackground());
+		
+		System.out.println("THE LIST: " + l.toString());
+		right = r;
+		add(listView, r ? BorderLayout.EAST : BorderLayout.WEST);
+	}
+	public void setList(List<TransferRequest> l) {
+		requestsModel.setList(l);
 	}
 }
 
-class TransferStatus extends JPanel {
+class TransferStatus extends JPanel implements InventoryEventListener {
+	PathStatus topPath;
+	PathStatus bottomPath;
 	public TransferStatus(String ts, String bs, String ticon, String bicon, List<TransferRequest> ti, List<TransferRequest> bi) { 
 		BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
 		setLayout(layout);
-		this.setMaximumSize(new Dimension(1000, 150));
-		this.setPreferredSize(new Dimension(1000, 150));
 
 		JPanel sep = new JPanel();
-		sep.setBackground(Color.GRAY);
-		sep.setPreferredSize(new Dimension(1000, 5));
-		sep.setMaximumSize(new Dimension(1000, 5));
+		sep.setMaximumSize(new Dimension(2000, 5));
+		sep.setBackground(Color.RED);
+
+		topPath = new PathStatus(ticon, ti, false);
+		bottomPath = new PathStatus(bicon, bi, false);
 
 		JLabel topLabel = new JLabel(ts);
 		JLabel bottomLabel = new JLabel(bs);
-
 		add(topLabel);
 		add(new JLabel(new ImageIcon(getClass().getResource("/icons/arrow-left.png"))));
-		add(new PathStatus(ticon, ti ));
+		add(topPath);
 		add(sep);
-		add(new PathStatus(bicon, bi));
+		add(bottomPath);
 		add(new JLabel(new ImageIcon(getClass().getResource("/icons/arrow-right.png"))));
 		add(bottomLabel);
 	}
 
+	@Override
+	public void onTransferRequestUpdate(String name, List<TransferRequest> l) {
+	System.out.println("EVENT HAPPENDED: " + name);
+		if (name.equals("TOP")) {
+			topPath.setList(l);
+		} else if (name.equals("BOTTOM")) {
+			bottomPath.setList(l);
+		}
+	}
 }
+
 public class InventoryStatus extends JPanel {
 	StoreStatus storeStatus;
 	StorageStatus storageStatus;
@@ -111,6 +144,7 @@ public class InventoryStatus extends JPanel {
 				inventory.requests,
 				inventory.inboundOrders
 				);
+
 		rightStatus = new TransferStatus(
 				"Transferencia", "Orden de Salida", "/icons/request.png", "/icons/leaving.png",
 				inventory.stockTransfers,
@@ -122,5 +156,8 @@ public class InventoryStatus extends JPanel {
 		add(storageStatus);
 		add(rightStatus);
 		add(storeStatus);
+		
+		inventory.addInventoryEventListener(leftStatus);
+		inventory.addInventoryEventListener(rightStatus);
 	}
 }

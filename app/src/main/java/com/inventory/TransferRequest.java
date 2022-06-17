@@ -19,4 +19,7 @@ public class TransferRequest {
 		creation_date = new Date();
 		status = TransferRequestStatus.CREATED;
 	}
+	public String toString() {
+		return id;
+	}
 }

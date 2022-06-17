@@ -22,9 +22,9 @@ import com.inventory.utils.JListFromList;
 
 public class EditProductDialog<T> extends EditDialog<Product, T> {
 	JLabel labelName = new JLabel("Nombre:");
-	JTextField inputName;
 	JLabel labelType = new JLabel("Tipo:");
 	JLabel labelProvider = new JLabel("Provider:");
+	JTextField inputName;
 	JListEnum<ProductType> inputType;
 	JListFromList<Provider> inputProvider;
 

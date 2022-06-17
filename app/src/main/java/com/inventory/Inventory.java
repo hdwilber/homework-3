@@ -1,7 +1,14 @@
 package com.inventory;
 
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.List;
+
+import javax.swing.event.EventListenerList;
+
+interface InventoryEventListener extends EventListener {
+	public void onTransferRequestUpdate(String target, List<TransferRequest> l);
+}
 
 public class Inventory {
 	List<Depot> depots;
@@ -11,6 +18,7 @@ public class Inventory {
 	List<TransferRequest> inboundOrders;
 	List<TransferRequest> stockTransfers;
 	List<TransferRequest> outboundOrders;
+    EventListenerList listenerList = new EventListenerList();
 	
 	public Inventory() {
 		depots = new ArrayList<Depot>();
@@ -48,9 +56,28 @@ public class Inventory {
 
 		status = new InventoryStatus(this);
 	}
+
+    public void addInventoryEventListener(InventoryEventListener l) {
+        listenerList.add(InventoryEventListener.class, l);
+    }
+
+    public void removeListDataListener(InventoryEventListener l) {
+        listenerList.remove(InventoryEventListener.class, l);
+    }
+
+    public void fireInventoryEvent(String s, List<TransferRequest> l) {
+    	Object[] listeners = listenerList.getListenerList();
+    	for (int i = listeners.length-2; i >= 0; i-=2) {
+    		if (listeners[i] == InventoryEventListener.class) {
+    			((InventoryEventListener)listeners[i+1]).onTransferRequestUpdate(s,  l);
+    		}
+    	}
+    }
+
 	
 	public void addRequest(Request o, Request p) {
 		addOrReplace(requests, o, p);
+		fireInventoryEvent("TOP", requests);
 	}
 
 	public void addProvider(Provider o, Provider p) {
