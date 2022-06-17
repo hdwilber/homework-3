@@ -9,15 +9,29 @@ enum TransferRequestStatus {
 	RECEIVED
 }
 
+enum TransferRequestPriority {
+	NONE,
+	LOW,
+	MID,
+	HIGH,
+};
+
+
+
 public class TransferRequest {
 	String id;
 	Date creation_date;
 	TransferRequestStatus status;
+	TransferRequestPriority priority;
 
 	public TransferRequest() {
+		this(TransferRequestPriority.NONE);
+	}
+	public TransferRequest(TransferRequestPriority p) {
 		id = UUID.randomUUID().toString();
 		creation_date = new Date();
 		status = TransferRequestStatus.CREATED;
+		priority = p;
 	}
 	public String toString() {
 		return id;

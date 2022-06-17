@@ -79,6 +79,10 @@ public class Inventory {
 		addOrReplace(requests, o, p);
 		fireInventoryEvent("TOP", requests);
 	}
+	
+	public void addStockTransfers(StockTransfer o, StockTransfer p) {
+		
+	}
 
 	public void addProvider(Provider o, Provider p) {
 		addOrReplace(providers, o, p);
