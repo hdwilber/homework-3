@@ -15,6 +15,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.NumberFormatter;
 
+import com.inventory.utils.JListEnum;
 import com.inventory.utils.JListFromList;
 
 public class EditRequestDialog<T> extends EditDialog<Request, T> implements ListSelectionListener  {
@@ -24,14 +25,17 @@ public class EditRequestDialog<T> extends EditDialog<Request, T> implements List
 	JLabel labelProduct = new JLabel("Producto:");
 	JLabel labelProvider = new JLabel("Proveedor:");
 	JLabel labelAmount = new JLabel("Cantidad:");
+	JLabel labelPriority = new JLabel("Prioridad:");
 	
 	JListFromList<Product> productList;
 	JListFromList<Provider> providerList;
 	JFormattedTextField inputAmount;
+	JListEnum<TransferRequestPriority> inputPriority;
 	
 	public <Request>EditRequestDialog(JFrame o, EditDialogListener<T> l) {
 		super(o, l);
 		setTitle("Pedir");
+		inputPriority = new JListEnum<TransferRequestPriority>(TransferRequestPriority.class);
 	}
 
 	public void setData(Request d, List<Provider> lp) {
@@ -72,11 +76,13 @@ public class EditRequestDialog<T> extends EditDialog<Request, T> implements List
         		.addComponent(labelProvider)
         		.addComponent(labelProduct)
         		.addComponent(labelAmount)
+        		.addComponent(labelPriority)
         		);
         hGroup.addGroup(layout.createParallelGroup(Alignment.LEADING)
         		.addComponent(providerList)
         		.addComponent(productList)
         		.addComponent(inputAmount)
+        		.addComponent(inputPriority)
         		);
         layout.setHorizontalGroup(hGroup);
 
@@ -90,6 +96,9 @@ public class EditRequestDialog<T> extends EditDialog<Request, T> implements List
         vGroup.addGroup(layout.createParallelGroup(Alignment.LEADING)
         		.addComponent(labelAmount)
         		.addComponent(inputAmount));
+        vGroup.addGroup(layout.createParallelGroup(Alignment.LEADING)
+        		.addComponent(labelPriority)
+        		.addComponent(inputPriority));
         layout.setVerticalGroup(vGroup);	
         
         form.invalidate();

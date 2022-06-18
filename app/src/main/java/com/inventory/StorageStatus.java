@@ -8,7 +8,9 @@ import javax.swing.border.EmptyBorder;
 
 public class StorageStatus extends ItemStatus {
 	ImageIcon icon;
-	public StorageStatus() {
+	Inventory inventory;
+	public StorageStatus(Inventory i) {
 		super("/icons/storage.png", "ALMACEN");
+		inventory = i;
 	}
 }

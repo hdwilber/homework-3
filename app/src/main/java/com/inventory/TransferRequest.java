@@ -6,19 +6,33 @@ import java.util.UUID;
 enum TransferRequestStatus {
 	CREATED,
 	SENT,
-	RECEIVED
+	RECEIVED,
+	PROCESSED
 }
 
 enum TransferRequestPriority {
-	NONE,
-	LOW,
-	MID,
-	HIGH,
+	NONE(0, "NINGUNA"),
+	LOW(1, "BAJA"),
+	MIDDLE(2, "MEDIA"),
+	HIGH(3, "ALTA"),
+	VERY_HIGH(5, "MUY ALTA"),
+	ALL_MIGHTY(10, "IMPARABLE");
+
+	private final String name;
+	private final int value;
+	TransferRequestPriority(int v, String p) {
+		value = v;
+		name = p;
+	}
+	public String toString() {
+		return name;
+	}
+	public int getValue() {
+		return value;
+	}
 };
 
-
-
-public class TransferRequest {
+public class TransferRequest implements Comparable<TransferRequest> {
 	String id;
 	Date creation_date;
 	TransferRequestStatus status;
@@ -42,5 +56,10 @@ public class TransferRequest {
 	
 	public void setPriority(TransferRequestPriority p) {
 		priority = p;
+	}
+
+	@Override
+	public int compareTo(TransferRequest o) {
+		return priority.getValue() - o.priority.getValue();
 	}
 }
