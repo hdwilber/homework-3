@@ -1,6 +1,8 @@
 package com.inventory;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -10,6 +12,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -21,6 +24,7 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 	ProductListTable productsTable;
 	Inventory inventory;
 	InventoryStatus status;
+	DepotStatus depotStatus;
 
 	public static void main(String args[]) {
 		InventoryManager manager = new InventoryManager();
@@ -36,6 +40,7 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 		inventory = new Inventory();
 		status = new InventoryStatus(inventory);
 		productsTable = new ProductListTable(inventory.providers);
+		depotStatus = new DepotStatus();
 
 		setupContent();
 	}
@@ -79,10 +84,12 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 			}
 		});    
 
-		setLayout(new BorderLayout());
-		add(getTopMenu(), BorderLayout.NORTH);
+		Container pane = getContentPane();
+		pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
+		pane.add(getTopMenu());
 //		add(productsTable, BorderLayout.CENTER);
-		add(status, BorderLayout.CENTER);
+		pane.add(status);
+		pane.add(depotStatus);
 		pack();
 		setVisible(true);
 	}
