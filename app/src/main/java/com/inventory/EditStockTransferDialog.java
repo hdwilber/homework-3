@@ -1,7 +1,6 @@
 package com.inventory;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.GroupLayout;
@@ -9,7 +8,6 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -17,26 +15,25 @@ import javax.swing.text.NumberFormatter;
 
 import com.inventory.utils.JListFromList;
 
-public class EditRequestDialog<T> extends EditDialog<Request, T> implements ListSelectionListener  {
+public class EditStockTransferDialog<T> extends EditDialog<StockTransfer, T> implements ListSelectionListener{
 	List<Provider> providers;
 	List<Product> products;
-	
+
 	JLabel labelProduct = new JLabel("Producto:");
 	JLabel labelProvider = new JLabel("Proveedor:");
 	JLabel labelAmount = new JLabel("Cantidad:");
-	
+
 	JListFromList<Product> productList;
 	JListFromList<Provider> providerList;
 	JFormattedTextField inputAmount;
-	
-	public <Request>EditRequestDialog(JFrame o, EditDialogListener<T> l) {
-		super(o, l);
-		setTitle("Pedir");
+
+	public EditStockTransferDialog(JFrame owner, EditDialogListener<T> l) {
+		super(owner, l);
+		setTitle("Pedir Stock");
 	}
 
-	public void setData(Request d, List<Provider> lp) {
+	public void setData(StockTransfer d, List<Provider> lp) {
 		providers = lp;
-		
 		providerList = new JListFromList<Provider>(Provider[].class, lp);
 		int index = 0;
 		providerList.setSelectedIndex(index);
@@ -97,17 +94,18 @@ public class EditRequestDialog<T> extends EditDialog<Request, T> implements List
 	}
 
 	@Override
-	public Request getData() {
+	public StockTransfer getData() {
 		Provider provider = providerList.getSelectedValue();
 		Product product = productList.getSelectedValue();
 		int amount = (int) inputAmount.getValue();
-		return new Request(provider, product, amount);
+		return new StockTransfer(product, amount);
 	}
 
 	@Override
-	public void valueChanged(ListSelectionEvent arg0) {
+	public void valueChanged(ListSelectionEvent e) {
 		Provider p = providerList.getSelectedValue();
 		productList.setListData(Product[].class, p.products);
 		pack();
 	}
+
 }

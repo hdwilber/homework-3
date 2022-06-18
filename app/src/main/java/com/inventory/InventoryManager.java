@@ -17,6 +17,7 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 	EditProductDialog<T> editProductDialog;
 	EditRequestDialog<T> editRequestDialog;
 	EditProviderDialog<T> editProviderDialog;
+	EditStockTransferDialog<T> editStockTransferDialog;
 	ProductListTable productsTable;
 	Inventory inventory;
 	InventoryStatus status;
@@ -30,6 +31,8 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 		editProductDialog = new EditProductDialog<T>(this, this);
 		editRequestDialog = new EditRequestDialog<T>(this, this);
 		editProviderDialog = new EditProviderDialog<T>(this, this);
+		editStockTransferDialog = new EditStockTransferDialog<T>(this, this);
+
 		inventory = new Inventory();
 		status = new InventoryStatus(inventory);
 		productsTable = new ProductListTable(inventory.providers);
@@ -38,21 +41,25 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 	}
 	public JPanel getTopMenu() {
 		JButton newProductButton = new JButton("Agregar producto");
+		JButton newRequestButton = new JButton("Nuevo pedido");
+		JButton transferButton = new JButton("Transferir");
+		JButton addProvider = new JButton("Agregar Proveedor");
+
 		newProductButton.addActionListener(event -> {
 			editProductDialog.setData(null, inventory.providers);
 			editProductDialog.setVisible(true);
 		});
-		JButton newRequestButton = new JButton("Nuevo pedido");
 		newRequestButton.addActionListener(l -> {
 			editRequestDialog.setData(null, inventory.providers);
 			editRequestDialog.setVisible(true);
 		});
-
-		JButton transferButton = new JButton("Transferir");
-		JButton addProvider = new JButton("Agregar Proveedor");
 		addProvider.addActionListener(event -> {
 			editProviderDialog.setData(null);
 			editProviderDialog.setVisible(true);
+		});
+		transferButton.addActionListener(l -> {
+			editStockTransferDialog.setData(null, inventory.providers);
+			editStockTransferDialog.setVisible(true);
 		});
 
 		JPanel topButtons = new JPanel();
@@ -89,8 +96,9 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 			inventory.addRequest((Request)original, (Request)data);
 		} else if (data instanceof Provider) {
 			inventory.addProvider((Provider)original, (Provider)data);
+		} else if (data instanceof StockTransfer) {
+			inventory.addStockTransfer((StockTransfer)original, (StockTransfer)data);
 		}
-		inventory.debug();
 		dialog.setVisible(false);
 		
 	}

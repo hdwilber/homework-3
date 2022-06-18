@@ -4,9 +4,9 @@ public class StockTransfer extends TransferRequest {
 	Product product;
 	int amount;
 
-	public StockTransfer(Product p, int a, TransferRequestPriority priority) {
-		super(priority);
-		product = p;
+	public StockTransfer(Product pro, int a) {
+		super();
+		product = pro;
 		amount = a;
 	}
 

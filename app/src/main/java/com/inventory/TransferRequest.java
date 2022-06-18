@@ -36,4 +36,11 @@ public class TransferRequest {
 	public String toString() {
 		return id;
 	}
+	public void setStatus(TransferRequestStatus s) {
+		status = s;
+	}
+	
+	public void setPriority(TransferRequestPriority p) {
+		priority = p;
+	}
 }

@@ -80,12 +80,13 @@ class PathStatus extends JPanel {
 		listView.setVisibleRowCount(1);
 		listView.setBackground(getBackground());
 		
-		System.out.println("THE LIST: " + l.toString());
 		right = r;
 		add(listView, r ? BorderLayout.EAST : BorderLayout.WEST);
 	}
 	public void setList(List<TransferRequest> l) {
-		requestsModel.setList(l);
+		if (requestsModel.list == l) {
+			requestsModel.setList(l);
+		}
 	}
 }
 
@@ -116,7 +117,6 @@ class TransferStatus extends JPanel implements InventoryEventListener {
 
 	@Override
 	public void onTransferRequestUpdate(String name, List<TransferRequest> l) {
-	System.out.println("EVENT HAPPENDED: " + name);
 		if (name.equals("TOP")) {
 			topPath.setList(l);
 		} else if (name.equals("BOTTOM")) {
