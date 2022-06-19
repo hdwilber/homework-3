@@ -10,6 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.border.EmptyBorder;
 
 public class InventoryManager<T> extends JFrame implements EditDialogListener<T> {
 	private static final long serialVersionUID = 1L;
@@ -69,6 +70,8 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 		topButtons.add(newRequestButton);
 		topButtons.add(transferButton);
 		topButtons.add(addProvider);
+		
+		topButtons.setBorder(new EmptyBorder(12, 12, 12, 12));
 
 		return topButtons;
 	}
@@ -82,6 +85,9 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 		JTabbedPane tabbedPane = new JTabbedPane();
 		JPanel dashboard = new JPanel();
 		JPanel products = new JPanel();
+		productsTable.setBorder(new EmptyBorder(12, 12, 12, 12));
+		status.setBorder(new EmptyBorder(12, 12, 12, 12));
+		depotStatus.setBorder(new EmptyBorder(12, 12, 12, 12));
 		tabbedPane.addTab("Dashboard", dashboard);
 		tabbedPane.addTab("Productos", productsTable);
 		tabbedPane.addTab("Estadisticas", new JPanel());
