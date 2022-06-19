@@ -1,6 +1,7 @@
 package com.inventory;
 
 import java.awt.Container;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -8,6 +9,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 
 public class InventoryManager<T> extends JFrame implements EditDialogListener<T> {
 	private static final long serialVersionUID = 1L;
@@ -77,13 +79,23 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 				System.exit(0);
 			}
 		});    
+		JTabbedPane tabbedPane = new JTabbedPane();
+		JPanel dashboard = new JPanel();
+		JPanel products = new JPanel();
+		tabbedPane.addTab("Dashboard", dashboard);
+		tabbedPane.addTab("Productos", productsTable);
+		tabbedPane.addTab("Estadisticas", new JPanel());
+		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
+		tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
+		tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
 
-		Container pane = getContentPane();
-		pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
-		pane.add(getTopMenu());
-//		add(productsTable, BorderLayout.CENTER);
-		pane.add(status);
-		pane.add(depotStatus);
+		dashboard.setLayout(new BoxLayout(dashboard, BoxLayout.Y_AXIS));
+		dashboard.add(getTopMenu());
+		dashboard.add(status);
+		dashboard.add(depotStatus);
+		
+		getContentPane().add(tabbedPane);
+		
 		pack();
 		setVisible(true);
 	}
