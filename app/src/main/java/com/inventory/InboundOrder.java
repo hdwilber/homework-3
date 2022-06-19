@@ -4,7 +4,7 @@ public class InboundOrder extends TransferRequest {
 	Request request;
 	int amount;
 	public InboundOrder(Request r) {
-		this(r, r.priority);
+		this(r, r.priority, r.amount);
 	}
 	public InboundOrder(Request r, TransferRequestPriority p) {
 		this(r, p, r.amount);

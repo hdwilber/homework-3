@@ -1,7 +1,5 @@
 package com.inventory;
 
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 
 import javax.swing.ImageIcon;
@@ -10,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 public class ItemStatus extends JPanel {
+	private static final long serialVersionUID = 1L;
 	ImageIcon icon;
 	public ItemStatus(String i, String l) {
 		icon = new ImageIcon(

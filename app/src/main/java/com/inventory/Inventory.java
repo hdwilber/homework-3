@@ -2,6 +2,7 @@ package com.inventory;
 
 import java.util.ArrayList;
 import java.util.EventListener;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -14,7 +15,7 @@ interface InventoryEventListener extends EventListener {
 }
 
 public class Inventory {
-	List<Depot> depots;
+	Depot depot;
 	List<Provider> providers;
 	Store store;
 
@@ -37,6 +38,10 @@ public class Inventory {
 					// DEPOSIT
 					allEvents.add(inboundOrders.poll());
 					fireInventoryEvent();
+					
+					boolean succeed = depot.receiveInboundOrder(inboundOrder);
+					System.out.println("DOES IT SUCCED " + succeed);
+
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -65,10 +70,21 @@ public class Inventory {
 					allEvents.add(stockTransfers.poll());
 					fireInventoryEvent("BOTTOM", stockTransfers);
 					stockTransfers.poll();
-					OutboundOrder result = new OutboundOrder(stockTransfer);
-					store.receiveOutboundOrder(result);
+					
+					if (depot.canMeetStockTransfer(stockTransfer)) {
+						System.out.println("WE HAVE ENOUGH");
+						List<OutboundOrder> orders = depot.receiveStockTransfer(stockTransfer);
+						Iterator<OutboundOrder> iter = orders.iterator();
+						while(iter.hasNext()) {
+							store.receiveOutboundOrder(iter.next());
+						}
+					} else {
+						System.out.println("WE DO NOT HAVE ENOUGH ITEMS");
+						OutboundOrder cancelledOrder = new OutboundOrder(stockTransfer);
+						stockTransfer.setStatus(TransferRequestStatus.REJECTED);
+						store.receiveOutboundOrder(cancelledOrder);
+					}
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			} catch(Exception error) {
@@ -83,7 +99,7 @@ public class Inventory {
 		
 	};
 	public Inventory() {
-		depots = new ArrayList<Depot>();
+		depot = new Depot(10, 10, 4);
 		store = new Store(this);
 		providers = new ArrayList<Provider>();
 		Provider provider  = new Provider(this, "Proveedor Jefe");
@@ -97,6 +113,13 @@ public class Inventory {
 		inboundOrders = new PriorityBlockingQueue<TransferRequest>();
 		stockTransfers = new PriorityBlockingQueue<TransferRequest>();
 		outboundOrders = new PriorityBlockingQueue<TransferRequest>();
+
+		
+		depot.receiveInboundOrder(new InboundOrder(new Request(provider, provider.products.get(0), 10, TransferRequestPriority.MIDDLE)));
+		depot.receiveInboundOrder(new InboundOrder(new Request(provider, provider.products.get(1), 4, TransferRequestPriority.HIGH)));
+		depot.receiveInboundOrder(new InboundOrder(new Request(provider, provider.products.get(2), 6, TransferRequestPriority.VERY_HIGH)));
+		depot.receiveInboundOrder(new InboundOrder(new Request(provider, provider.products.get(1), 15, TransferRequestPriority.LOW)));
+		depot.receiveInboundOrder(new InboundOrder(new Request(provider, provider.products.get(1), 9, TransferRequestPriority.HIGH)));
 
 		status = new InventoryStatus(this);
 		inboundChecker.startChecker();
@@ -171,13 +194,13 @@ public class Inventory {
 
 	public long getProcessingTime(InboundOrder io) {
 //		long time = ((long)(Math.random() * 1000)) * io.amount;
-		long time = 2000;
+		long time = 1000;
 		return time;
 	}
 
 	public long getProcessingTime(StockTransfer io) {
 //		long time = ((long)(Math.random() * 500)) * io.amount;
-		long time = 2000;
+		long time = 1000;
 		return time;
 	}
 }

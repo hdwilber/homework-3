@@ -1,7 +1,5 @@
 package com.inventory;
 
-import java.util.Date;
-
 public class Request extends TransferRequest {
 	Product product;
 	int amount;
@@ -12,9 +10,12 @@ public class Request extends TransferRequest {
 	}
 	public Request(Provider pro, Product p, int a, TransferRequestPriority priority) {
 		super(priority);
-		System.out.println("Setting priority " + priority);
 		product = p;
 		amount = a;
 		provider = pro;
+	}
+	
+	public Product getProduct() {
+		return product;
 	}
 }

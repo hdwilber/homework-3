@@ -2,17 +2,14 @@ package com.inventory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import com.inventory.utils.ProcessRequestChecker;
-import com.inventory.utils.Scheduler;
 
 public class Provider extends ProcessRequestChecker {
 	Inventory inventory;
 	String name;
-	List<Product> products;
+	public List<Product> products;
 	public PriorityBlockingQueue<TransferRequest> requestsQueue;
 	int capacity;
 
@@ -45,7 +42,7 @@ public class Provider extends ProcessRequestChecker {
 
 	public long getProcessingTime(Request r) {
 //		long time = ((long)(Math.random() * 1000)) * r.amount;
-		long time = 2000;
+		long time = 1000;
 		return time;
 	}
 	

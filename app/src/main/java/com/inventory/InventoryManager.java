@@ -1,22 +1,16 @@
 package com.inventory;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.List;
 
 import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.GroupLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class InventoryManager<T> extends JFrame implements EditDialogListener<T> {
+	private static final long serialVersionUID = 1L;
 	EditProductDialog<T> editProductDialog;
 	EditRequestDialog<T> editRequestDialog;
 	EditProviderDialog<T> editProviderDialog;
@@ -27,7 +21,7 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 	DepotStatus depotStatus;
 
 	public static void main(String args[]) {
-		InventoryManager manager = new InventoryManager();
+		new InventoryManager<Object>();
 	}
 
 	public InventoryManager() {
@@ -40,7 +34,7 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 		inventory = new Inventory();
 		status = new InventoryStatus(inventory);
 		productsTable = new ProductListTable(inventory.providers);
-		depotStatus = new DepotStatus();
+		depotStatus = new DepotStatus(inventory.depot);
 
 		setupContent();
 	}

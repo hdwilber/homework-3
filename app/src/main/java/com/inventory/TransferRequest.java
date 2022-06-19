@@ -7,7 +7,8 @@ enum TransferRequestStatus {
 	CREATED,
 	SENT,
 	RECEIVED,
-	PROCESSED
+	PROCESSED,
+	REJECTED
 }
 
 enum TransferRequestPriority {
@@ -15,11 +16,12 @@ enum TransferRequestPriority {
 	LOW(1, "BAJA"),
 	MIDDLE(2, "MEDIA"),
 	HIGH(3, "ALTA"),
-	VERY_HIGH(5, "MUY ALTA"),
-	ALL_MIGHTY(10, "IMPARABLE");
+	VERY_HIGH(4, "MUY ALTA"),
+	ALL_MIGHTY(5, "IMPARABLE");
 
 	private final String name;
 	private final int value;
+
 	TransferRequestPriority(int v, String p) {
 		value = v;
 		name = p;

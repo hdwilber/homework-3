@@ -16,6 +16,7 @@ class Store extends ProcessRequestChecker {
 	public void receiveOutboundOrder(OutboundOrder o) {
 		o.setStatus(TransferRequestStatus.RECEIVED);
 		outboundOrders.add(o);
+		inventory.fireInventoryEvent();
 		continueChecker();
 	}
 

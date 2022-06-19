@@ -17,11 +17,19 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 
 class PathStatusItem extends JLabel implements ListCellRenderer<TransferRequest> {
 	private static final long serialVersionUID = 1L;
+	public static Color[] palette = {
+			new Color(Integer.valueOf("5f66fb", 16)),
+			new Color(Integer.valueOf("00c7e0", 16)),
+			new Color(Integer.valueOf("5ed599", 16)),
+			new Color(Integer.valueOf("b5c85f", 16)),
+			new Color(Integer.valueOf("d79650", 16)),
+			new Color(Integer.valueOf("d16b6b", 16)),
+	};
+
 	public PathStatusItem(Image icon) {
 		super(new ImageIcon(icon));
 		setOpaque(true);
@@ -29,32 +37,9 @@ class PathStatusItem extends JLabel implements ListCellRenderer<TransferRequest>
 	@Override
 	public Component getListCellRendererComponent(JList<? extends TransferRequest> list, TransferRequest value,
 			int index, boolean isSelected, boolean cellHasFocus) {
-		Color c = Color.BLUE;
-		System.out.println(value);
-		switch(value.priority) {
-			case NONE:
-				break;
-			case LOW:
-				c = Color.orange;
-				break;
-			case MIDDLE:
-				c = Color.red;
-				break;
-			case HIGH:
-				c = Color.green;
-				break;
-			case VERY_HIGH:
-				c = Color.cyan;
-				break;
-			case ALL_MIGHTY:
-				c = Color.yellow;
-				break;
-			default:
-				break;
-		}
-		
+		Color c = palette[value.priority.getValue()];
 		setToolTipText(value.id);
-		setBorder(BorderFactory.createCompoundBorder(new LineBorder(c), new EmptyBorder(8, 8, 8, 8)));
+		setBorder(BorderFactory.createCompoundBorder(new LineBorder(c, 2), new EmptyBorder(8, 8, 8, 8)));
 		invalidate();
 		return this;
 	}
@@ -82,8 +67,7 @@ class PathStatusModel extends AbstractListModel<TransferRequest> {
 		if (index < arrayList.length) {
 			return arrayList[right ? arrayList.length - index -1 : index];
 		}
-		System.out.println("NEVER SHOULD GET HERE");
-		return new TransferRequest();
+		return null;
 	}
 	
 	public void updateList() {
@@ -94,6 +78,7 @@ class PathStatusModel extends AbstractListModel<TransferRequest> {
 }
 
 class PathStatus extends JPanel {
+	private static final long serialVersionUID = 1L;
 	Image icon;
 	PathStatusModel requestsModel;
 	JList<TransferRequest> listView;
@@ -127,6 +112,7 @@ class PathStatus extends JPanel {
 }
 
 class TransferStatus extends JPanel implements InventoryEventListener {
+	private static final long serialVersionUID = 1L;
 	PathStatus topPath;
 	PathStatus bottomPath;
 	public TransferStatus(String ts, String bs, String ticon, String bicon, PriorityBlockingQueue<TransferRequest> ti, PriorityBlockingQueue<TransferRequest> bi) { 
@@ -158,6 +144,7 @@ class TransferStatus extends JPanel implements InventoryEventListener {
 }
 
 public class InventoryStatus extends JPanel {
+	private static final long serialVersionUID = 1L;
 	StoreStatus storeStatus;
 	StorageStatus storageStatus;
 	ProviderStatus providerStatus;

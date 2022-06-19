@@ -1,6 +1,5 @@
 package com.inventory.utils;
 
-import java.awt.Graphics;
 import java.lang.reflect.Array;
 import java.util.List;
 
@@ -9,10 +8,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.event.ListSelectionListener;
 
-import com.inventory.EditRequestDialog;
-import com.inventory.Provider;
-
 public class JListFromList<T> extends JPanel {
+	private static final long serialVersionUID = 1L;
 	public boolean empty = true;
 	public JLabel emptyLabel = new JLabel("La lista esta vacia");
 	JList<T> listView;

@@ -1,26 +1,21 @@
 package com.inventory;
 
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.WindowConstants;
 
 import com.inventory.utils.JListEnum;
 import com.inventory.utils.JListFromList;
 
 public class EditProductDialog<T> extends EditDialog<Product, T> {
+	private static final long serialVersionUID = 1L;
 	JLabel labelName = new JLabel("Nombre:");
 	JLabel labelType = new JLabel("Tipo:");
 	JLabel labelProvider = new JLabel("Provider:");
