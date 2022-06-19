@@ -5,9 +5,11 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.util.Arrays;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import javax.swing.AbstractListModel;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -15,17 +17,45 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.LineBorder;
 
 class PathStatusItem extends JLabel implements ListCellRenderer<TransferRequest> {
 	private static final long serialVersionUID = 1L;
 	public PathStatusItem(Image icon) {
 		super(new ImageIcon(icon));
-		setBorder(new EmptyBorder(8, 8, 8, 8));
+		setOpaque(true);
 	}
 	@Override
 	public Component getListCellRendererComponent(JList<? extends TransferRequest> list, TransferRequest value,
 			int index, boolean isSelected, boolean cellHasFocus) {
+		Color c = Color.BLUE;
+		System.out.println(value);
+		switch(value.priority) {
+			case NONE:
+				break;
+			case LOW:
+				c = Color.orange;
+				break;
+			case MIDDLE:
+				c = Color.red;
+				break;
+			case HIGH:
+				c = Color.green;
+				break;
+			case VERY_HIGH:
+				c = Color.cyan;
+				break;
+			case ALL_MIGHTY:
+				c = Color.yellow;
+				break;
+			default:
+				break;
+		}
+		
 		setToolTipText(value.id);
+		setBorder(BorderFactory.createCompoundBorder(new LineBorder(c), new EmptyBorder(8, 8, 8, 8)));
+		invalidate();
 		return this;
 	}
 }
@@ -38,39 +68,42 @@ class PathStatusModel extends AbstractListModel<TransferRequest> {
 	public PathStatusModel(PriorityBlockingQueue<TransferRequest> l, boolean r) {
 		list = l;
 		right = r;
+		updateList();
+		arrayList = list.toArray(TransferRequest[]::new);
 	}
 
 	@Override
 	public int getSize() {
-		return list.size();
+		return arrayList.length;
 	}
 
 	@Override
 	public TransferRequest getElementAt(int index) {
-		if (arrayList.length < index) {
-			return arrayList[right ? list.size() - index -1 : index];
+		if (index < arrayList.length) {
+			return arrayList[right ? arrayList.length - index -1 : index];
 		}
+		System.out.println("NEVER SHOULD GET HERE");
 		return new TransferRequest();
 	}
 	
-	public void setList(PriorityBlockingQueue<TransferRequest> l) {
-		arrayList = l.toArray(TransferRequest[]::new);
-		fireContentsChanged(arrayList, getSize(), getSize());
-	}
 	public void updateList() {
 		arrayList = list.toArray(TransferRequest[]::new);
-		fireContentsChanged(arrayList, getSize(), getSize());
+		Arrays.sort(arrayList);
+		fireContentsChanged(this, getSize(), getSize());
 	}
 }
+
 class PathStatus extends JPanel {
 	Image icon;
 	PathStatusModel requestsModel;
 	JList<TransferRequest> listView;
 	boolean right;
+	String iconResource;
 
 	public PathStatus(String ic, PriorityBlockingQueue<TransferRequest> l, boolean r) {
 		super();
 		requestsModel = new PathStatusModel(l, r);
+		iconResource = ic;
 		setMaximumSize(new Dimension(2000, 50));
 		setLayout(new BorderLayout());
 		Image image = new ImageIcon(getClass().getResource(ic)).getImage();
@@ -87,9 +120,7 @@ class PathStatus extends JPanel {
 		right = r;
 		add(listView, r ? BorderLayout.EAST : BorderLayout.WEST);
 	}
-	public void setList(PriorityBlockingQueue<TransferRequest> l) {
-		requestsModel.setList(l);
-	}
+
 	public void updateList() {
 		requestsModel.updateList();
 	}

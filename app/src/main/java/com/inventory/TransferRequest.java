@@ -48,7 +48,7 @@ public class TransferRequest implements Comparable<TransferRequest> {
 		priority = p;
 	}
 	public String toString() {
-		return id;
+		return id + " (" + priority +")";
 	}
 	public void setStatus(TransferRequestStatus s) {
 		status = s;
@@ -60,6 +60,6 @@ public class TransferRequest implements Comparable<TransferRequest> {
 
 	@Override
 	public int compareTo(TransferRequest o) {
-		return priority.getValue() - o.priority.getValue();
+		return o.priority.getValue() - priority.getValue();
 	}
 }

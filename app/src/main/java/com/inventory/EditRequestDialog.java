@@ -110,7 +110,8 @@ public class EditRequestDialog<T> extends EditDialog<Request, T> implements List
 		Provider provider = providerList.getSelectedValue();
 		Product product = productList.getSelectedValue();
 		int amount = (int) inputAmount.getValue();
-		return new Request(provider, product, amount);
+		TransferRequestPriority priority = inputPriority.getSelectedValue();
+		return new Request(provider, product, amount, priority);
 	}
 
 	@Override

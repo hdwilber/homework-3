@@ -34,10 +34,9 @@ public class Inventory {
 				try {
 					Thread.sleep(getProcessingTime(inboundOrder));
 					inboundOrder.setStatus(TransferRequestStatus.PROCESSED);
-
 					// DEPOSIT
 					allEvents.add(inboundOrders.poll());
-					fireInventoryEvent("BOTTOM", inboundOrders);
+					fireInventoryEvent();
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -134,7 +133,8 @@ public class Inventory {
     public void receiveInboundOrder(InboundOrder in) {
     	in.setStatus(TransferRequestStatus.RECEIVED);
     	inboundOrders.add(in);
-		fireInventoryEvent("BOTTOM", inboundOrders);
+		fireInventoryEvent();
+
 		inboundChecker.continueChecker();
     }
     
@@ -144,7 +144,6 @@ public class Inventory {
 	
 	public void addRequest(Request o, Request p) {
 		allEvents.add(p);
-		fireInventoryEvent("TOP", p.provider.requestsQueue);
 		p.provider.receiveRequest(p);
 	}
 	
@@ -171,12 +170,14 @@ public class Inventory {
 	}
 
 	public long getProcessingTime(InboundOrder io) {
-		long time = ((long)(Math.random() * 1000)) * io.amount;
+//		long time = ((long)(Math.random() * 1000)) * io.amount;
+		long time = 2000;
 		return time;
 	}
 
 	public long getProcessingTime(StockTransfer io) {
-		long time = ((long)(Math.random() * 500)) * io.amount;
+//		long time = ((long)(Math.random() * 500)) * io.amount;
+		long time = 2000;
 		return time;
 	}
 }

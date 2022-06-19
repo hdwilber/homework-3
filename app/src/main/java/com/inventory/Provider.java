@@ -39,11 +39,13 @@ public class Provider extends ProcessRequestChecker {
 	public void receiveRequest(Request r) {
 		r.setStatus(TransferRequestStatus.RECEIVED);
 		requestsQueue.add(r);
+		inventory.fireInventoryEvent();
 		continueChecker();
 	}
 
 	public long getProcessingTime(Request r) {
-		long time = ((long)(Math.random() * 1000)) * r.amount;
+//		long time = ((long)(Math.random() * 1000)) * r.amount;
+		long time = 2000;
 		return time;
 	}
 	
