@@ -120,6 +120,13 @@ public class Inventory {
 		depot.receiveInboundOrder(new InboundOrder(new Request(provider, provider.products.get(2), 6, TransferRequestPriority.VERY_HIGH)));
 		depot.receiveInboundOrder(new InboundOrder(new Request(provider, provider.products.get(1), 15, TransferRequestPriority.LOW)));
 		depot.receiveInboundOrder(new InboundOrder(new Request(provider, provider.products.get(1), 9, TransferRequestPriority.HIGH)));
+		
+		addRequest(null, new Request(provider, provider.products.get(0), 2, TransferRequestPriority.LOW));
+		addRequest(null, new Request(provider, provider.products.get(1), 1, TransferRequestPriority.MIDDLE));
+		addRequest(null, new Request(provider, provider.products.get(2), 2, TransferRequestPriority.HIGH));
+		addRequest(null, new Request(provider, provider.products.get(1), 2, TransferRequestPriority.VERY_HIGH));
+		addRequest(null, new Request(provider, provider.products.get(1), 2, TransferRequestPriority.VERY_HIGH));
+
 
 		status = new InventoryStatus(this);
 		inboundChecker.startChecker();
@@ -194,13 +201,13 @@ public class Inventory {
 
 	public long getProcessingTime(InboundOrder io) {
 //		long time = ((long)(Math.random() * 1000)) * io.amount;
-		long time = 1000;
+		long time = 2500;
 		return time;
 	}
 
 	public long getProcessingTime(StockTransfer io) {
 //		long time = ((long)(Math.random() * 500)) * io.amount;
-		long time = 1000;
+		long time = 2500;
 		return time;
 	}
 }
