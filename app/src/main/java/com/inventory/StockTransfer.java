@@ -10,4 +10,8 @@ public class StockTransfer extends TransferRequest {
 		amount = a;
 	}
 
+	public String getLabel() {
+		return product.name + "(" + amount + ", " + priority + ")";
+	}
+
 }

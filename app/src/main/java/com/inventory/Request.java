@@ -18,4 +18,8 @@ public class Request extends TransferRequest {
 	public Product getProduct() {
 		return product;
 	}
+	
+	public String getLabel() {
+		return product.name + "(" + amount + ", " + priority + ")";
+	}
 }

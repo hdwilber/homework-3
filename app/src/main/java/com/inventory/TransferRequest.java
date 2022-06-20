@@ -7,6 +7,7 @@ enum TransferRequestStatus {
 	CREATED,
 	SENT,
 	RECEIVED,
+	PROCESSING,
 	PROCESSED,
 	REJECTED
 }
@@ -34,7 +35,7 @@ enum TransferRequestPriority {
 	}
 };
 
-public class TransferRequest implements Comparable<TransferRequest> {
+public abstract class TransferRequest implements Comparable<TransferRequest> {
 	String id;
 	Date creation_date;
 	TransferRequestStatus status;
@@ -64,4 +65,6 @@ public class TransferRequest implements Comparable<TransferRequest> {
 	public int compareTo(TransferRequest o) {
 		return o.priority.getValue() - priority.getValue();
 	}
+	
+	public abstract String getLabel();
 }

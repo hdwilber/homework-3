@@ -14,4 +14,8 @@ public class InboundOrder extends TransferRequest {
 		request = r;
 		amount = a;
 	}
+
+	public String getLabel() {
+		return request.product.name + "(" + amount + ", " + priority + ")";
+	}
 }

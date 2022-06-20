@@ -34,13 +34,18 @@ public class Inventory {
 				InboundOrder inboundOrder = (InboundOrder)inboundOrders.element();
 				try {
 					Thread.sleep(getProcessingTime(inboundOrder));
-					inboundOrder.setStatus(TransferRequestStatus.PROCESSED);
+					inboundOrder.setStatus(TransferRequestStatus.PROCESSING);
 					// DEPOSIT
 					allEvents.add(inboundOrders.poll());
 					fireInventoryEvent();
 					
 					boolean succeed = depot.receiveInboundOrder(inboundOrder);
-					System.out.println("DOES IT SUCCED " + succeed);
+					if(succeed) {
+						inboundOrder.setStatus(TransferRequestStatus.PROCESSED);
+					} else {
+						inboundOrder.setStatus(TransferRequestStatus.REJECTED);
+						System.out.println("INBOUND ORDER: " + inboundOrder.getLabel() + "  : REJECTED");
+					}
 
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block

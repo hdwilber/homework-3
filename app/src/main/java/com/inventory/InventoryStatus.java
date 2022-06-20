@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Image;
 import java.util.Arrays;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -38,6 +39,10 @@ class PathStatusItem extends JLabel implements ListCellRenderer<TransferRequest>
 	public Component getListCellRendererComponent(JList<? extends TransferRequest> list, TransferRequest value,
 			int index, boolean isSelected, boolean cellHasFocus) {
 		Color c = palette[value.priority.getValue()];
+		setText(value.getLabel());
+		setHorizontalTextPosition(CENTER);
+		setVerticalTextPosition(TOP);
+		setFont(getFont().deriveFont(1, 10.0f));
 		setToolTipText(value.id);
 		setBorder(BorderFactory.createCompoundBorder(new LineBorder(c, 2), new EmptyBorder(8, 8, 8, 8)));
 		invalidate();
@@ -89,7 +94,9 @@ class PathStatus extends JPanel {
 		super();
 		requestsModel = new PathStatusModel(l, r);
 		iconResource = ic;
-		setMaximumSize(new Dimension(2000, 50));
+		setMaximumSize(new Dimension(1000, 75));
+		setPreferredSize(new Dimension(500, 75));
+		setMinimumSize(new Dimension(500, 75));
 		setLayout(new BorderLayout());
 		Image image = new ImageIcon(getClass().getResource(ic)).getImage();
 		icon = image.getScaledInstance(25, 25,  java.awt.Image.SCALE_SMOOTH); // scale it smoothly  
@@ -120,6 +127,7 @@ class TransferStatus extends JPanel implements InventoryEventListener {
 		setLayout(layout);
 		JPanel sep = new JPanel();
 		sep.setMaximumSize(new Dimension(2000, 5));
+		sep.setPreferredSize(new Dimension(2000, 5));
 		sep.setBackground(Color.RED);
 
 		topPath = new PathStatus(ticon, ti, false);

@@ -15,4 +15,8 @@ public class OutboundOrder extends TransferRequest {
 	public void setAmount(int a) {
 		amount = a;
 	}
+	
+	public String getLabel() {
+		return stockTransfer.product.name + "(" + amount + ", " + priority + ")";
+	}
 }
