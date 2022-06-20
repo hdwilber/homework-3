@@ -49,6 +49,6 @@ public class EditProviderDialog<T> extends EditDialog<Provider, T> {
 	@Override
 	public Provider getData() {
 		String name = inputName.getText();
-		return new Provider(name);
+		return new Provider(name, 2, 2);
 	}
 }

@@ -57,7 +57,7 @@ public class DepotStatus extends JPanel implements DepotEventListener {
 
 	@Override
 	public void onDepotItemStoreComplete() {
-		System.out.println("STORED");
+//		System.out.println("STORED");
 		this.repaint();
 	}
 

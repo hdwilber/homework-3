@@ -21,7 +21,6 @@ class TransferRequestExecutor extends Thread implements Comparable<TransferReque
 		request = r;
 		count++;
 		id = count;
-
 	}
 	
 	public String toString() {
@@ -32,7 +31,7 @@ class TransferRequestExecutor extends Thread implements Comparable<TransferReque
 	public void run() {
 		try {
 			Thread.sleep(Math.round(Math.random() * 5000));
-			System.out.println("---");
+//			System.out.println("---");
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -88,7 +87,7 @@ class SortedList<T extends Comparable<T>> extends ArrayList<T> {
 	}
 }
 
-public class TransferRequestProcessor implements Runnable {
+public abstract class TransferRequestProcessor implements Runnable {
 	ThreadPoolExecutor executor;
 	ExecutorCompletionService<TransferRequestExecutor> completionService;
 	int capacity;
@@ -106,41 +105,22 @@ public class TransferRequestProcessor implements Runnable {
 		pausedQueue = new SortedList<TransferRequestExecutor>();
 		awaitingQueue = new SortedList<TransferRequestExecutor>();
 		
-		executor.execute(new Runnable() {
-			public void run() {
-				while(true) {
-					try {
-						Future<TransferRequestExecutor> taskWrapper = completionService.take();
-						if (taskWrapper != null) {
-							try {
-								TransferRequestExecutor task = taskWrapper.get();
-								reconcilieQueues(task);
-							} catch (InterruptedException | ExecutionException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-					} catch (InterruptedException e1) {
-						System.out.println("INTERRUPTED");
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				}
-				
-			}
-		});
+		executor.execute(this);
 	}
 	
+	public abstract void onTaskComplete(TransferRequestExecutor task);
+
 	public synchronized void reconcilieQueues(TransferRequestExecutor completedTask) {
 		boolean res = queue.remove(completedTask);
 		if (res) {
-			System.out.println(completedTask.toString() + " TERMINADO y removido: " + res); 
+//			System.out.println(completedTask.toString() + " TERMINADO y removido: " + res); 
 		} else {
-			System.out.println(completedTask.toString() + " TERMINADO Y removido: " +  pausedQueue.remove(completedTask) + " EN PAUSED "); 
+			pausedQueue.remove(completedTask);
+//			System.out.println(completedTask.toString() + " TERMINADO Y removido: " +  pausedQueue.remove(completedTask) + " EN PAUSED "); 
 		}
 		if (pausedQueue.size() > 0) {
 			TransferRequestExecutor pausedTask = pausedQueue.poll();
-			System.out.println(pausedTask + " RESUMIENDO");
+//			System.out.println(pausedTask + " RESUMIENDO");
 			pausedTask.setPaused(false);
 			queue.add(pausedTask);
 			if (pausedTask.isStarted) {
@@ -149,64 +129,63 @@ public class TransferRequestProcessor implements Runnable {
 				completionService.submit(pausedTask);
 			}
 		}
+		onTaskComplete(completedTask);
 
-		System.out.println("------------------");
-		System.out.println("Queue: " + queue.size() + " - " +  queue);
-		System.out.println("Paused: " + pausedQueue.size() + " - " +  pausedQueue);
-		System.out.println("------------------");
+//		System.out.println("------------------");
+//		System.out.println("Queue: " + queue.size() + " - " +  queue);
+//		System.out.println("Paused: " + pausedQueue.size() + " - " +  pausedQueue);
+//		System.out.println("------------------");
 	}
 	
 	public synchronized boolean processTransferRequest(TransferRequest r) {
-		if (queue.size() < capacity) {
+		if (queue.size() <= (capacity -1)) {
 			TransferRequestExecutor task = new TransferRequestExecutor(r);
-			System.out.println(task.toString() + " ADDED ");
+//			System.out.println(task.toString() + " ADDED ");
 			queue.add(task);
 			completionService.submit(task);
 			return true;
-		} else if (pausedQueue.size() < pausedCapacity){
-			System.out.println("There is a: " + queue.size());
+		} else if (pausedQueue.size() <= (pausedCapacity - 1)){
+//			System.out.println("There is a: " + queue.size());
 			TransferRequestExecutor taskToPause = queue.head();
 			if (r.compareTo(taskToPause.request) < 0) {
-				System.out.println("Higher priority. "+ taskToPause.toString() + " PAUSING ");
+//				System.out.println("Higher priority. "+ taskToPause.toString() + " PAUSING ");
 				taskToPause.suspend();
 				taskToPause.setPaused(true);
 				queue.remove(taskToPause);
 				pausedQueue.add(taskToPause);
 				TransferRequestExecutor task = new TransferRequestExecutor(r);
-				System.out.println(task.toString() + " ADDED REPLACING " + taskToPause);
+//				System.out.println(task.toString() + " ADDED REPLACING " + taskToPause);
 				queue.add(task);
 				completionService.submit(task);
 			} else {
 				TransferRequestExecutor task = new TransferRequestExecutor(r);
 				task.setPaused(true);
-				System.out.println(task.toString() + " ADDED PAUSED ");
+//				System.out.println(task.toString() + " ADDED PAUSED ");
 				pausedQueue.add(task);
 			}
 			return true;
 		}
-		System.out.println("REJECTING - QUEUES FULL");
+//		System.out.println("REJECTING - QUEUES FULL");
 		return false;
 	}
-	
-	public boolean hasQueuedProcesses() {
-		return queue.size() > 0 || pausedQueue.size() > 0;
-	}
 
+	@Override
 	public void run() {
-		while(hasQueuedProcesses()) {
-
+		while(true) {
+			try {
+				Future<TransferRequestExecutor> taskWrapper = completionService.take();
+				if (taskWrapper != null) {
+					try {
+						TransferRequestExecutor task = taskWrapper.get();
+						reconcilieQueues(task);
+					} catch (InterruptedException | ExecutionException e) {
+						e.printStackTrace();
+					}
+				}
+			} catch (InterruptedException e1) {
+//				System.out.println("INTERRUPTED");
+				e1.printStackTrace();
+			}
 		}
-	}
-	
-	public static void main(String args[]) {
-		TransferRequestProcessor pro = new TransferRequestProcessor(5, 3);
-//		pro.processTransferRequest(new TransferRequest(TransferRequestPriority.MIDDLE));
-//		pro.processTransferRequest(new TransferRequest(TransferRequestPriority.LOW));
-//		pro.processTransferRequest(new TransferRequest(TransferRequestPriority.MIDDLE));
-//		pro.processTransferRequest(new TransferRequest(TransferRequestPriority.HIGH));
-//		pro.processTransferRequest(new TransferRequest(TransferRequestPriority.LOW));
-//		pro.processTransferRequest(new TransferRequest(TransferRequestPriority.LOW));
-//		pro.processTransferRequest(new TransferRequest(TransferRequestPriority.LOW));
-//		pro.processTransferRequest(new TransferRequest(TransferRequestPriority.ALL_MIGHTY));
 	}
 }

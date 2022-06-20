@@ -12,7 +12,11 @@ public class ShelfStatus {
 
 	public void drawProduct(InventoryItem item, Graphics g, int w, int h) {
 		g.setColor(item.order.request.getProduct().color);
-		g.fillRect(0, 0, w, h);
+		if (item.order.status == TransferRequestStatus.PROCESSED) {
+			g.fillRect(0, 0, w, h);
+		} else if (item.order.status == TransferRequestStatus.PROCESSING) {
+			g.drawRect(0, 0, w, h);
+		}
 		g.setColor(PathStatusItem.palette[item.order.priority.getValue()]);
 		g.fillOval(w - 35, h - 35, 25, 25);
 		g.setColor(Color.black);

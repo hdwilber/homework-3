@@ -59,7 +59,20 @@ class PathStatusModel extends AbstractListModel<TransferRequest> {
 		list = l;
 		right = r;
 		updateList();
-		arrayList = list.toArray(TransferRequest[]::new);
+	}
+
+	public void getArrayList() {
+		TransferRequest[] aux = list.toArray(TransferRequest[]::new);
+		Arrays.sort(aux);
+		if (aux.length > 0) {
+			if (aux.length >= 5) {
+				arrayList = Arrays.copyOfRange(aux, 0, 5);
+			} else {
+				arrayList = aux;
+			}
+		} else {
+			arrayList = aux;
+		}
 	}
 
 	@Override
@@ -76,8 +89,7 @@ class PathStatusModel extends AbstractListModel<TransferRequest> {
 	}
 	
 	public void updateList() {
-		arrayList = list.toArray(TransferRequest[]::new);
-		Arrays.sort(arrayList);
+		getArrayList();
 		fireContentsChanged(this, getSize(), getSize());
 	}
 }
@@ -126,8 +138,9 @@ class TransferStatus extends JPanel implements InventoryEventListener {
 		BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
 		setLayout(layout);
 		JPanel sep = new JPanel();
-		sep.setMaximumSize(new Dimension(2000, 5));
-		sep.setPreferredSize(new Dimension(2000, 5));
+		sep.setMaximumSize(new Dimension(1000, 5));
+		sep.setPreferredSize(new Dimension(1000, 5));
+		sep.setMinimumSize(new Dimension(500, 5));
 		sep.setBackground(Color.RED);
 
 		topPath = new PathStatus(ticon, ti, false);

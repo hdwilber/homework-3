@@ -110,8 +110,19 @@ public class Depot {
 		return result;
 	}
 	
+	int total = 0;
 	public boolean receiveInboundOrder(InboundOrder o) {
+		o.setStatus(TransferRequestStatus.PROCESSING);
 		boolean succeed = store(o);
+		o.setStatus(TransferRequestStatus.PROCESSED);
+		fireItemStoreComplete();
+		if (succeed) {
+			total += o.amount;
+			System.out.println("TOTAL " + total);
+		} else {
+			total -= o.amount;
+			System.out.println("TOTAL WITH REJECETED " + total);
+		}
 		return succeed;
 	}
 	
