@@ -120,7 +120,6 @@ public abstract class TransferRequestProcessor implements Runnable {
 		}
 		if (pausedQueue.size() > 0) {
 			TransferRequestExecutor pausedTask = pausedQueue.poll();
-//			System.out.println(pausedTask + " RESUMIENDO");
 			pausedTask.setPaused(false);
 			queue.add(pausedTask);
 			if (pausedTask.isStarted) {
@@ -140,32 +139,26 @@ public abstract class TransferRequestProcessor implements Runnable {
 	public synchronized boolean processTransferRequest(TransferRequest r) {
 		if (queue.size() <= (capacity -1)) {
 			TransferRequestExecutor task = new TransferRequestExecutor(r);
-//			System.out.println(task.toString() + " ADDED ");
 			queue.add(task);
 			completionService.submit(task);
 			return true;
 		} else if (pausedQueue.size() <= (pausedCapacity - 1)){
-//			System.out.println("There is a: " + queue.size());
 			TransferRequestExecutor taskToPause = queue.head();
 			if (r.compareTo(taskToPause.request) < 0) {
-//				System.out.println("Higher priority. "+ taskToPause.toString() + " PAUSING ");
 				taskToPause.suspend();
 				taskToPause.setPaused(true);
 				queue.remove(taskToPause);
 				pausedQueue.add(taskToPause);
 				TransferRequestExecutor task = new TransferRequestExecutor(r);
-//				System.out.println(task.toString() + " ADDED REPLACING " + taskToPause);
 				queue.add(task);
 				completionService.submit(task);
 			} else {
 				TransferRequestExecutor task = new TransferRequestExecutor(r);
 				task.setPaused(true);
-//				System.out.println(task.toString() + " ADDED PAUSED ");
 				pausedQueue.add(task);
 			}
 			return true;
 		}
-//		System.out.println("REJECTING - QUEUES FULL");
 		return false;
 	}
 

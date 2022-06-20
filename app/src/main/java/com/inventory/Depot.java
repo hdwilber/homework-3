@@ -118,10 +118,8 @@ public class Depot {
 		fireItemStoreComplete();
 		if (succeed) {
 			total += o.amount;
-			System.out.println("TOTAL " + total);
 		} else {
 			total -= o.amount;
-			System.out.println("TOTAL WITH REJECETED " + total);
 		}
 		return succeed;
 	}

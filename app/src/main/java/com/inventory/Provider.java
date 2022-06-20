@@ -65,7 +65,6 @@ public class Provider extends TransferRequestProcessor { //ProcessRequestChecker
 			requestsQueue.add(r);
 		}
 		inventory.fireInventoryEvent();
-		System.out.println("Provider - Requests: " + requestTotal);
 		fireStatusUpdateEvent();
 	}
 	

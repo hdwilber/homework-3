@@ -30,7 +30,50 @@ public class Inventory extends TransferRequestProcessor {
 	PriorityBlockingQueue<TransferRequest> outboundOrders;
     EventListenerList listenerList = new EventListenerList();
     EventListenerList storeListenerList = new EventListenerList();
-    
+
+    ProcessRequestChecker stockTransferChecker = new ProcessRequestChecker() {
+    	@Override
+    	public void processRequest() {
+    		try {
+    			StockTransfer stockTransfer = (StockTransfer)stockTransfers.element();
+    			try {
+    				Thread.sleep(getProcessingTime(stockTransfer));
+    				stockTransfer.setStatus(TransferRequestStatus.PROCESSED);
+
+    				// DEPOSIT
+    				allEvents.add(stockTransfers.poll());
+    				fireInventoryEvent("BOTTOM", stockTransfers);
+    				stockTransfers.poll();
+
+    				if (depot.canMeetStockTransfer(stockTransfer)) {
+    					System.out.println("WE HAVE ENOUGH");
+    					List<OutboundOrder> orders = depot.receiveStockTransfer(stockTransfer);
+    					Iterator<OutboundOrder> iter = orders.iterator();
+    					while(iter.hasNext()) {
+    						store.receiveOutboundOrder(iter.next());
+    					}
+    				} else {
+    					System.out.println("WE DO NOT HAVE ENOUGH ITEMS");
+    					OutboundOrder cancelledOrder = new OutboundOrder(stockTransfer);
+    					stockTransfer.setStatus(TransferRequestStatus.REJECTED);
+    					store.receiveOutboundOrder(cancelledOrder);
+    				}
+    			} catch (InterruptedException e) {
+    				e.printStackTrace();
+    			}
+    		} catch(Exception error) {
+    			pauseChecker();
+    		}
+    	}
+
+    	@Override
+    	public boolean shouldPauseChecker() {
+    		return stockTransfers.size() == 0;
+    	}
+
+    };
+
+   
 	public Inventory() {
 		super(2, 1);
 		depot = new Depot(10, 10, 4);
@@ -50,6 +93,8 @@ public class Inventory extends TransferRequestProcessor {
 
 		
 		status = new InventoryStatus(this);
+		stockTransferChecker.startChecker();
+		
 
 		addRequest(null, new Request(provider, provider.products.get(0), 2, TransferRequestPriority.LOW));
 		addRequest(null, new Request(provider, provider.products.get(1), 1, TransferRequestPriority.MIDDLE));
@@ -112,12 +157,12 @@ public class Inventory extends TransferRequestProcessor {
 		st.setStatus(TransferRequestStatus.RECEIVED);
 		stockTransfers.add(st);
 		fireInventoryEvent("BOTTOM", stockTransfers);
+		stockTransferChecker.continueChecker();
     }
     
     int totalIn = 0;
     public void receiveInboundOrder(InboundOrder in) {
     	totalIn += in.amount;
-    	System.out.println("INVEORY - RECEIVED:  " + totalIn);
     	in.setStatus(TransferRequestStatus.RECEIVED);
 
     	fireStoreStatusUpdate();

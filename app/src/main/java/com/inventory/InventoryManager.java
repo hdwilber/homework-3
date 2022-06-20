@@ -1,5 +1,6 @@
 package com.inventory;
 
+import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -43,7 +44,7 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 	}
 	public JPanel getTopMenu() {
 		JButton newProductButton = new JButton("Agregar producto");
-		JButton newRequestButton = new JButton("Nuevo pedido");
+		JButton newRequestButton = new JButton("Pedir");
 		JButton transferButton = new JButton("Transferir");
 		JButton addProvider = new JButton("Agregar Proveedor");
 
@@ -64,16 +65,23 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 			editStockTransferDialog.setVisible(true);
 		});
 
-		JPanel topButtons = new JPanel();
-		topButtons.setLayout(new BoxLayout(topButtons, BoxLayout.X_AXIS));
-		topButtons.add(newProductButton);
-		topButtons.add(newRequestButton);
-		topButtons.add(transferButton);
-		topButtons.add(addProvider);
-		
-		topButtons.setBorder(new EmptyBorder(12, 12, 12, 12));
+		JPanel topMenu = new JPanel();
+		JPanel topLeftButtons = new JPanel();
+		JPanel topRightButtons = new JPanel();
+		topMenu.setLayout(new BorderLayout());
+		topLeftButtons.setLayout(new BoxLayout(topLeftButtons, BoxLayout.X_AXIS));
+		topRightButtons.setLayout(new BoxLayout(topRightButtons, BoxLayout.X_AXIS));
 
-		return topButtons;
+		topLeftButtons.add(newRequestButton);
+		topLeftButtons.add(transferButton);
+
+		topRightButtons.add(newProductButton);
+		topRightButtons.add(addProvider);
+		
+		topMenu.setBorder(new EmptyBorder(12, 12, 12, 12));
+		topMenu.add(topLeftButtons, BorderLayout.WEST);
+		topMenu.add(topRightButtons, BorderLayout.EAST);
+		return topMenu;
 	}
 
 	public void setupContent() {
@@ -95,10 +103,11 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 		tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
 		tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
 
-		dashboard.setLayout(new BoxLayout(dashboard, BoxLayout.Y_AXIS));
-		dashboard.add(getTopMenu());
-		dashboard.add(status);
-		dashboard.add(depotStatus);
+//		dashboard.setLayout(new BoxLayout(dashboard, BoxLayout.Y_AXIS));
+		dashboard.setLayout(new BorderLayout());
+		dashboard.add(getTopMenu(), BorderLayout.NORTH);
+		dashboard.add(status, BorderLayout.CENTER);
+		dashboard.add(depotStatus, BorderLayout.SOUTH);
 		
 		getContentPane().add(tabbedPane);
 		
