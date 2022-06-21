@@ -116,6 +116,8 @@ class PathStatus extends JPanel {
 		PathStatusItem renderer = new PathStatusItem(icon);
 
 		setPreferredSize(new Dimension(getWidth(), 75));
+		setMinimumSize(new Dimension(0, 75));
+		setMaximumSize(new Dimension(2000, 75));
 
 		listView = new JList<TransferRequest>();
 		listView.setLayoutOrientation(JList.HORIZONTAL_WRAP);
@@ -150,6 +152,9 @@ class TransferStatus extends JPanel implements InventoryEventListener {
 		setLayout(layout);
 		JPanel sep = new JPanel();
 		sep.setBackground(Color.BLACK);
+		sep.setMinimumSize(new Dimension(getWidth(), 5));
+		sep.setPreferredSize(new Dimension(getWidth(), 5));
+		sep.setMaximumSize(new Dimension(2000, 5));
 
 		topPath = new PathStatus(ticon, ti, false);
 		bottomPath = new PathStatus(bicon, bi, true);
