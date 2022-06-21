@@ -104,4 +104,17 @@ public class Shelf {
 		}
 		return null;
 	}
+
+	public List<InventoryItem> getCurrentStockByProduct(Product p) {
+		List<InventoryItem> list = new ArrayList<InventoryItem>();
+		Iterator<InventoryItem> it = items.iterator();
+		while(it.hasNext()) { 
+			InventoryItem item = it.next();
+			Product product = item.order.request.getProduct();
+			if (product.name.equals(p.name)) {
+				list.add(item);
+			}
+		}
+		return list;
+	}
 }

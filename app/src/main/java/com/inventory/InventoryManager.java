@@ -38,7 +38,7 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 
 		inventory = new Inventory();
 		status = new InventoryStatus(inventory);
-		productsTable = new ProductListTable(inventory.providers);
+		productsTable = new ProductListTable(inventory, inventory.providers);
 		depotStatus = new DepotStatus(inventory.depot);
 
 		setupContent();
@@ -89,7 +89,6 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 		JTabbedPane tabbedPane = new JTabbedPane();
 		JPanel dashboard = new JPanel();
 		JPanel products = new JPanel();
-		productsTable.setBorder(new EmptyBorder(12, 12, 12, 12));
 		status.setBorder(new EmptyBorder(12, 12, 12, 12));
 		depotStatus.setBorder(new EmptyBorder(12, 12, 12, 12));
 		tabbedPane.addTab("Dashboard", dashboard);

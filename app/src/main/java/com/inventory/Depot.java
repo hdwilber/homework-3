@@ -80,6 +80,18 @@ public class Depot {
 		}
 	}
 
+	public List<InventoryItem> getCurrentStockByProduct(Product p) {
+		List<InventoryItem> list = new ArrayList<InventoryItem>();
+		for(int i = 0; i < shelves.length; i++) {
+			Shelf shelf = shelves[i];
+			List<InventoryItem> currentStock = shelf.getCurrentStockByProduct(p);
+			if (currentStock.size() > 0) {
+				list.addAll(currentStock);
+			}
+		}
+		return list;
+	}
+
 	public boolean canMeetStockTransfer(StockTransfer o) {
 		int left = o.amount;
 		for(int i = 0; i < shelves.length; i++) {

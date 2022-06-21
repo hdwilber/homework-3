@@ -45,8 +45,8 @@ public class ShelfStatus {
 	}
 	
 	public void draw(Graphics g, int w, int h) {
-		g.setColor(Color.LIGHT_GRAY);
-		g.fillRect(0, 0, w, h);
+//		g.setColor(Color.LIGHT_GRAY);
+//		g.fillRect(0, 0, w, h);
 		
 		drawItems(g, w, h);
 	}
