@@ -1,9 +1,13 @@
 package com.inventory;
 
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JFormattedTextField;
@@ -38,6 +42,10 @@ public class EditRequestDialog<T> extends EditDialog<Request, T> implements List
 		inputPriority = new JListEnum<TransferRequestPriority>(TransferRequestPriority.class);
 	}
 
+	public String getDialogTitle() {
+		return "Hacer Pedido";
+	}
+
 	public void setData(Request d, List<Provider> lp) {
 		providers = lp;
 		
@@ -64,12 +72,15 @@ public class EditRequestDialog<T> extends EditDialog<Request, T> implements List
 		formatter.setMinimum(0);
 		formatter.setMaximum(Integer.MAX_VALUE);
 		formatter.setAllowsInvalid(false);
-		inputAmount = new JFormattedTextField(formatter);
+		inputAmount = new JFormattedTextField();
 		
 		GroupLayout layout = new GroupLayout(form);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
         form.setLayout(layout);
+        
+//        providerList.setLayout(new BoxLayout(providerList, BoxLayout.X_AXIS));
+//        providerList.setLayout(new FlowLayout());
 
         GroupLayout.SequentialGroup hGroup = layout.createSequentialGroup();
         hGroup.addGroup(layout.createParallelGroup(Alignment.LEADING)
@@ -85,7 +96,6 @@ public class EditRequestDialog<T> extends EditDialog<Request, T> implements List
         		.addComponent(inputPriority)
         		);
         layout.setHorizontalGroup(hGroup);
-
         GroupLayout.SequentialGroup vGroup = layout.createSequentialGroup();
         vGroup.addGroup(layout.createParallelGroup(Alignment.LEADING)
         		.addComponent(labelProvider)

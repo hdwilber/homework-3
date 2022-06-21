@@ -13,8 +13,8 @@ public class ProviderStatus extends ItemStatus implements ProviderEventListener 
 		provider = p;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		p.addInventoryEventListener(this);
-		processingLabel = new JLabel("");
-		pausedLabel = new JLabel("");
+		processingLabel = new JLabel("En Proceso:");
+		pausedLabel = new JLabel("En Pausa:");
 		
 		add(processingLabel);
 		add(pausedLabel);

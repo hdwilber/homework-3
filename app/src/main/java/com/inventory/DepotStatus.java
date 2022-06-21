@@ -16,6 +16,7 @@ public class DepotStatus extends JPanel implements DepotEventListener {
 		super();
 		depot = d;
 		setupShelves();
+		setMinimumSize(new Dimension(500, 500));
 		setPreferredSize(new Dimension(1000, 1000));
 		d.addDepotEventListener(this);
 	}

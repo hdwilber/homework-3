@@ -5,18 +5,22 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.util.Arrays;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.ListCellRenderer;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
@@ -106,23 +110,30 @@ class PathStatus extends JPanel {
 		super();
 		requestsModel = new PathStatusModel(l, r);
 		iconResource = ic;
-		setMaximumSize(new Dimension(1000, 75));
-		setPreferredSize(new Dimension(500, 75));
-		setMinimumSize(new Dimension(500, 75));
-		setLayout(new BorderLayout());
+		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 		Image image = new ImageIcon(getClass().getResource(ic)).getImage();
 		icon = image.getScaledInstance(25, 25,  java.awt.Image.SCALE_SMOOTH); // scale it smoothly  
 		PathStatusItem renderer = new PathStatusItem(icon);
+
+		setPreferredSize(new Dimension(getWidth(), 75));
+
 		listView = new JList<TransferRequest>();
 		listView.setLayoutOrientation(JList.HORIZONTAL_WRAP);
 		listView.setAlignmentX(r ? Component.RIGHT_ALIGNMENT : Component.LEFT_ALIGNMENT);
 		listView.setCellRenderer(renderer);
 		listView.setModel(requestsModel);
 		listView.setVisibleRowCount(1);
-		listView.setBackground(getBackground());
-		
 		right = r;
-		add(listView, r ? BorderLayout.EAST : BorderLayout.WEST);
+		
+		if (r) {
+			add(Box.createHorizontalGlue());
+			add(listView);
+			add(Box.createHorizontalStrut(10));
+		} else {
+			add(Box.createHorizontalStrut(10));
+			add(listView);
+			add(Box.createHorizontalGlue());
+		}
 	}
 
 	public void updateList() {
@@ -135,26 +146,49 @@ class TransferStatus extends JPanel implements InventoryEventListener {
 	PathStatus topPath;
 	PathStatus bottomPath;
 	public TransferStatus(String ts, String bs, String ticon, String bicon, PriorityBlockingQueue<TransferRequest> ti, PriorityBlockingQueue<TransferRequest> bi) { 
-		BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
+		BoxLayout layout = new BoxLayout(this, BoxLayout.PAGE_AXIS);
 		setLayout(layout);
 		JPanel sep = new JPanel();
-		sep.setMaximumSize(new Dimension(1000, 5));
-		sep.setPreferredSize(new Dimension(1000, 5));
-		sep.setMinimumSize(new Dimension(500, 5));
-		sep.setBackground(Color.RED);
+		sep.setBackground(Color.BLACK);
 
 		topPath = new PathStatus(ticon, ti, false);
 		bottomPath = new PathStatus(bicon, bi, true);
 
 		JLabel topLabel = new JLabel(ts);
 		JLabel bottomLabel = new JLabel(bs);
-		add(topLabel);
-		add(new JLabel(new ImageIcon(getClass().getResource("/icons/arrow-left.png"))));
-		add(topPath);
+		
+		JPanel topPanel = new JPanel();
+		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.PAGE_AXIS));
+
+		JPanel bottomPanel = new JPanel();
+		bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.PAGE_AXIS));
+		
+		JPanel topLegend = new JPanel();
+		JPanel bottomLegend = new JPanel();
+		topLegend.setLayout(new BoxLayout(topLegend,BoxLayout.PAGE_AXIS));
+		topLegend.add(topLabel);
+		topLegend.add(new JLabel(new ImageIcon(getClass().getResource("/icons/arrow-left.png"))));
+		topLegend.setAlignmentX(CENTER_ALIGNMENT);
+
+		bottomLegend.setLayout(new BoxLayout(bottomLegend,BoxLayout.PAGE_AXIS));
+		bottomLegend.add(new JLabel(new ImageIcon(getClass().getResource("/icons/arrow-right.png"))));
+		bottomLegend.add(bottomLabel);
+		bottomLegend.setAlignmentX(CENTER_ALIGNMENT);
+		
+		topPanel.add(Box.createVerticalGlue());
+		topPanel.add(topLegend);
+		topPanel.add(topPath);
+		topPanel.add(Box.createVerticalGlue());
+
+		bottomPanel.add(Box.createVerticalGlue());
+		bottomPanel.add(bottomPath);
+		bottomPanel.add(bottomLegend);
+		bottomPanel.add(Box.createVerticalGlue());
+
+
+		add(topPanel);
 		add(sep);
-		add(bottomPath);
-		add(new JLabel(new ImageIcon(getClass().getResource("/icons/arrow-right.png"))));
-		add(bottomLabel);
+		add(bottomPanel);
 	}
 
 	@Override
@@ -177,6 +211,7 @@ public class InventoryStatus extends JPanel {
 		providerStatus = new ProviderStatus(p);
 		storageStatus = new StorageStatus(inventory);
 		storeStatus = new StoreStatus(inventory.store);
+
 		leftStatus = new TransferStatus(
 				"Pedido",
 				"Orden de Entrada",
@@ -195,12 +230,16 @@ public class InventoryStatus extends JPanel {
 				inventory.store.outboundOrders
 				);
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+
 		add(providerStatus);
+		add(Box.createHorizontalStrut(16));
 		add(leftStatus);
+		add(Box.createHorizontalStrut(16));
 		add(storageStatus);
+		add(Box.createHorizontalStrut(16));
 		add(rightStatus);
+		add(Box.createHorizontalStrut(16));
 		add(storeStatus);
-		
 		inventory.addInventoryEventListener(leftStatus);
 		inventory.addInventoryEventListener(rightStatus);
 	}

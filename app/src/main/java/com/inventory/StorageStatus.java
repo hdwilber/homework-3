@@ -15,8 +15,8 @@ public class StorageStatus extends ItemStatus implements StoreStatusListener {
 		inventory = i;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-		processingLabel = new JLabel("");
-		pausedLabel = new JLabel("");
+		processingLabel = new JLabel("En Proceso:");
+		pausedLabel = new JLabel("En Pausa:");
 		inventory.addStorageStatusListener(this);
 		
 		add(processingLabel);

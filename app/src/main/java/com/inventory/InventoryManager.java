@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -66,21 +67,16 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 		});
 
 		JPanel topMenu = new JPanel();
-		JPanel topLeftButtons = new JPanel();
-		JPanel topRightButtons = new JPanel();
-		topMenu.setLayout(new BorderLayout());
-		topLeftButtons.setLayout(new BoxLayout(topLeftButtons, BoxLayout.X_AXIS));
-		topRightButtons.setLayout(new BoxLayout(topRightButtons, BoxLayout.X_AXIS));
-
-		topLeftButtons.add(newRequestButton);
-		topLeftButtons.add(transferButton);
-
-		topRightButtons.add(newProductButton);
-		topRightButtons.add(addProvider);
+		topMenu.setLayout(new BoxLayout(topMenu, BoxLayout.X_AXIS));
+		topMenu.add(newRequestButton);
+		topMenu.add(Box.createHorizontalStrut(8));
+		topMenu.add(transferButton);
+		topMenu.add(Box.createHorizontalGlue());
+		topMenu.add(newProductButton);
+		topMenu.add(Box.createHorizontalStrut(8));
+		topMenu.add(addProvider);
 		
 		topMenu.setBorder(new EmptyBorder(12, 12, 12, 12));
-		topMenu.add(topLeftButtons, BorderLayout.WEST);
-		topMenu.add(topRightButtons, BorderLayout.EAST);
 		return topMenu;
 	}
 
@@ -103,11 +99,15 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 		tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
 		tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
 
-//		dashboard.setLayout(new BoxLayout(dashboard, BoxLayout.Y_AXIS));
-		dashboard.setLayout(new BorderLayout());
-		dashboard.add(getTopMenu(), BorderLayout.NORTH);
-		dashboard.add(status, BorderLayout.CENTER);
-		dashboard.add(depotStatus, BorderLayout.SOUTH);
+		dashboard.setLayout(new BoxLayout(dashboard, BoxLayout.PAGE_AXIS));
+
+		dashboard.add(Box.createVerticalStrut(8));
+		dashboard.add(getTopMenu());
+		dashboard.add(Box.createVerticalStrut(8));
+		dashboard.add(status);
+		dashboard.add(Box.createVerticalStrut(8));
+		dashboard.add(depotStatus);
+		dashboard.add(Box.createVerticalStrut(8));
 		
 		getContentPane().add(tabbedPane);
 		

@@ -1,11 +1,15 @@
 package com.inventory;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -13,8 +17,14 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 
 interface EditDialogListener<U> {
 	public void onEditDialogComplete(EditDialog dialog, U original, U data);
@@ -24,6 +34,7 @@ interface EditDialogListener<U> {
 public abstract class EditDialog<T, U> extends JDialog implements ActionListener {
 	final static String ACTION_OK = "OK";
 	final static String ACTION_CANCEL = "CANCEL";
+	final static EmptyBorder DEFAULT_PADDING = new EmptyBorder(8, 8, 8, 8);
 
 	EditDialogListener<U> listener;
 	T original;
@@ -45,18 +56,25 @@ public abstract class EditDialog<T, U> extends JDialog implements ActionListener
 		getRootPane().getActionMap().put("closex", closeAction);
 	}
 	
+	public abstract String getDialogTitle();
+
 	public void setData(T p) {
-		setTitle(p != null ? "Edit" : "Add");
-		label.setText(p != null ? "Edit:" : "Add:");
+		setTitle(getDialogTitle());
+		label.setText(getDialogTitle());
 		original = p;
 	}
 	
 	public void setupContent() {
-		getContentPane().removeAll();
-		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
-        getContentPane().add(label);
-        getContentPane().add(getForm());
-        getContentPane().add(getActionButtons());
+		Container pane = getContentPane();
+		pane.removeAll();
+		JPanel main = new JPanel();
+		main.setBorder(new CompoundBorder(DEFAULT_PADDING, new TitledBorder(LineBorder.createGrayLineBorder(), getDialogTitle())));
+		main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS));
+        main.add(getForm());
+        main.add(new JSeparator());
+        main.add(getActionButtons());
+        getContentPane().add(main);
+        pack();
 	}
 	
 	public abstract JPanel getForm();
@@ -70,8 +88,11 @@ public abstract class EditDialog<T, U> extends JDialog implements ActionListener
         okButton.addActionListener(this);
         cancelButton.addActionListener(this);
         actionButtons.setLayout(new BoxLayout(actionButtons, BoxLayout.X_AXIS));
+        actionButtons.add(Box.createHorizontalGlue());
         actionButtons.add(cancelButton);
+        actionButtons.add(Box.createHorizontalStrut(16));
         actionButtons.add(okButton);
+        actionButtons.setBorder(DEFAULT_PADDING);
         return actionButtons;
 	}
 

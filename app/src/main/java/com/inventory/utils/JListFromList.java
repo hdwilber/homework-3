@@ -1,8 +1,11 @@
 package com.inventory.utils;
 
+import java.awt.BorderLayout;
 import java.lang.reflect.Array;
 import java.util.List;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -17,6 +20,7 @@ public class JListFromList<T> extends JPanel {
 	public JListFromList(Class<T[]> klass, List<T> list) {
 		super();
 		listView = new JList<T>();
+		setLayout(new BorderLayout());
 		setListData(klass, list);
 	}
 	
@@ -28,10 +32,10 @@ public class JListFromList<T> extends JPanel {
 		
 		if (empty) {
 			remove(listView);
-			add(emptyLabel);
+			add(emptyLabel, BorderLayout.CENTER);
 		} else {
 			remove(emptyLabel);
-			add(listView);
+			add(listView, BorderLayout.CENTER);
 		}
 		invalidate();
 	}

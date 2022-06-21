@@ -22,8 +22,6 @@ public class ItemStatus extends JPanel {
 		label.setHorizontalTextPosition(JLabel.CENTER);
 		label.setVerticalTextPosition(JLabel.BOTTOM);
 		label.setBorder(new EmptyBorder(10, 10, 10, 10));
-		setPreferredSize(new Dimension(150, 150));
-		setMaximumSize(new Dimension(150, 150));
 		add(label);
 	}
 }

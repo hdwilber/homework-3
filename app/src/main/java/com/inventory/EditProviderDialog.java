@@ -16,6 +16,10 @@ public class EditProviderDialog<T> extends EditDialog<Provider, T> {
 		setupContent();
 	}
 
+	public String getDialogTitle() {
+		return "Agregar Proveedor";
+	}
+
 	@Override
 	public void setData(Provider p) {
 		super.setData(p);

@@ -32,6 +32,9 @@ public class EditStockTransferDialog<T> extends EditDialog<StockTransfer, T> imp
 		setTitle("Pedir Stock");
 	}
 
+	public String getDialogTitle() {
+		return "Transferir Stock";
+	}
 	public void setData(StockTransfer d, List<Provider> lp) {
 		providers = lp;
 		providerList = new JListFromList<Provider>(Provider[].class, lp);

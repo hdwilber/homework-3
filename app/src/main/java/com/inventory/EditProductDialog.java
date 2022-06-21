@@ -28,6 +28,10 @@ public class EditProductDialog<T> extends EditDialog<Product, T> {
 		inputName = new JTextField(10);
 		inputType = new JListEnum<ProductType>(ProductType.class);
 	}
+	
+	public String getDialogTitle() {
+		return "Agregar Producto";
+	}
 
 	public void setData(Product p, List<Provider> lp) {
 		super.setData(p);
