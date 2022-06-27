@@ -46,7 +46,8 @@ public class Provider extends TaskRequestProcessor {
 
 	public long getProcessingTime(TaskRequest io) {
 		InventoryRequest ir = (InventoryRequest)io;
-		long time = ((long)(Math.random() * 1000)) * ir.getAmount();
+//		long time = ((long)(Math.random() * 1000)) * ir.getAmount();
+		long time = 250;
 		return time;
 	}
 

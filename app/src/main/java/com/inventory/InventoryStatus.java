@@ -68,11 +68,7 @@ class PathStatusModel extends AbstractListModel<TaskRequest> {
 
 	public void getArrayList() {
 		TaskRequest[] aux = list.toArray(TaskRequest[]::new);
-    Arrays.sort(aux);
-    //System.out.println("LISTING ARRAY LIST: " + (aux.length));
-    //for(int i = 0; i < aux.length; i++) {
-      //System.out.println(aux[i]);
-    //}
+		Arrays.sort(aux);
 		if (aux.length > 0) {
 			if (aux.length >= 5) {
 				arrayList = Arrays.copyOfRange(aux, 0, 5);
@@ -204,7 +200,6 @@ class TransferStatus extends JPanel implements TaskRequestEventListener {
 	@Override
 	public void onTaskRequestEvent(TaskExecutor source, TaskRequestEventType type, TaskRequest t) {
 		// TODO Auto-generated method stub
-		System.out.println("RECEIVED EVENT: " + type + " - " + t);
 		topPath.updateList();
 		bottomPath.updateList();
 	}

@@ -1,19 +1,13 @@
 package com.inventory;
 
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -50,6 +44,9 @@ public class EditRequestDialog<T> extends EditDialog<InventoryRequest, T> implem
 	}
 
 	public void setData(InventoryRequest d, List<Provider> lp) {
+		setData(d, lp, null);
+	}
+	public void setData(InventoryRequest d, List<Provider> lp, Product product) {
 		providers = lp;
 		
 		providerList = new JListFromList<Provider>(Provider[].class, lp);
@@ -57,6 +54,11 @@ public class EditRequestDialog<T> extends EditDialog<InventoryRequest, T> implem
 		providerList.setSelectedIndex(index);
 		Provider p = providerList.getSelectedValue();
 		productList = new JListFromList<Product>(Product[].class, p.products);
+		if (product != null) {
+			int productIndex = p.products.indexOf(product);
+			productList.setSelectedIndex(productIndex);
+		}
+
 		providerList.addListSelectionListener(this);
 
 		super.setData(d);
@@ -75,7 +77,7 @@ public class EditRequestDialog<T> extends EditDialog<InventoryRequest, T> implem
 		formatter.setMinimum(0);
 		formatter.setMaximum(Integer.MAX_VALUE);
 		formatter.setAllowsInvalid(false);
-		inputAmount = new JFormattedTextField();
+		inputAmount = new JFormattedTextField(formatter);
 		
 		GroupLayout layout = new GroupLayout(form);
         layout.setAutoCreateGaps(true);

@@ -18,7 +18,7 @@ class TaskRequestExecution implements Runnable, Comparable<TaskRequestExecution>
 	public static int count = 1;
 	public int id;
 	private volatile boolean suspended = false;
-	Timer timer;
+	volatile Timer timer;
 	Thread current;
 
 	public TaskRequestExecution(TaskExecutor e, TaskRequest t) {
@@ -43,7 +43,6 @@ class TaskRequestExecution implements Runnable, Comparable<TaskRequestExecution>
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				System.out.println("Timer complete: " + toString());
 				if (!suspended && !current.isInterrupted()) {
 					current.interrupt();
 				}
@@ -57,14 +56,12 @@ class TaskRequestExecution implements Runnable, Comparable<TaskRequestExecution>
 			timer.schedule(new TimerTask() {
 				@Override
 				public void run() {
-					System.out.println("Timer complete: " + toString());
 					if (!suspended && !current.isInterrupted()) {
 						current.interrupt();
 					}
 				}
 			}, 4000);
 		}
-		System.out.println("Thread: " + id);
 		while(!Thread.currentThread().isInterrupted()){  
 			if(!suspended){  
 				try {
@@ -85,7 +82,6 @@ class TaskRequestExecution implements Runnable, Comparable<TaskRequestExecution>
 				}             
 			}                           
 		}  
-		System.out.println("Process complete : " + toString());
 	}
 
 	public TaskRequest getTaskRequest() {
@@ -198,25 +194,20 @@ public class TaskRequestProcessor implements Runnable, TaskExecutor {
 	}
 
 	public synchronized boolean processTaskRequest(TaskRequest t) {
-		System.out.println("COUNT: " + activeTasks.size() + " -- max: " + activeCapacity);
 		if (activeTasks.size() < activeCapacity) {
 			TaskRequestExecution task = new TaskRequestExecution(this, t);
 			activeTasks.add(task);
 			completionService.submit(task, task);
 			return true;
 		} else if (pausedTasks.size() < pausedCapacity) {
-			System.out.println("WE CAN PAUSE ANY");
 			TaskRequestExecution task = new TaskRequestExecution(this, t);
 			if (activeTasks.canAdd(task)) {
-				System.out.println("WE CAN ADD and PAUSE");
 				TaskRequestExecution pausedTask = activeTasks.poll();
 				pausedTask.suspend();
-				System.out.println(pausedTask);
 				pausedTasks.add(pausedTask);
 				completionService.submit(task, task);
 				activeTasks.add(task);
 			} else {
-				System.out.println("Pause: " + task);
 				pausedTasks.add(task);
 				task.suspend();
 				completionService.submit(task, task);
@@ -237,7 +228,6 @@ public class TaskRequestProcessor implements Runnable, TaskExecutor {
 				if (taskWrapper != null) {
 					try {
 						TaskRequestExecution task = taskWrapper.get();
-						System.out.println("Something got complete " + task.toString());
 						onTaskRequestComplete(task.request);
 						reconcilieTaskQueues(task);
 						TaskRequest nextTask = queue.peek();

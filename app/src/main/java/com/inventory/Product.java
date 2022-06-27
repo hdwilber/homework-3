@@ -3,11 +3,21 @@ package com.inventory;
 import java.awt.Color;
 
 enum ProductType {
-	DEHYDRATED,
-	FRESH,
-	MEAT,
-	CLEANING
+	DEHYDRATED("DESHIDRATADO"),
+	FRESH("FRESCO"),
+	MEAT("CARNES"),
+	CLEANING("LIMPIEZA");
+	
+	private final String name;
+	ProductType(String p) {
+		name = p;
+	}
+	
+	public String toString() {
+		return name;
+	}
 }
+
 public class Product {
 	private String name;
 	ProductType type;

@@ -35,13 +35,15 @@ public class ShelfStatus {
 		int effItemWidth = itemWidth - (2 * padding);
 		int effItemHeight = h - (2 * padding);
 		
-		Iterator<InventoryItem> iter = shelf.items.iterator();
-		while(iter.hasNext()) {
-			InventoryItem item = iter.next();
-			for(int i = 0; i < item.amount; i++) {
-				Graphics productGraphics = g.create(x+ padding, y+padding, effItemWidth, effItemHeight);
-				drawProduct(item, productGraphics, effItemWidth, effItemHeight);
-				x += itemWidth;
+		synchronized(shelf.items) { 
+			Iterator<InventoryItem> iter = shelf.items.iterator();
+			while(iter.hasNext()) {
+				InventoryItem item = iter.next();
+				for(int i = 0; i < item.amount; i++) {
+					Graphics productGraphics = g.create(x+ padding, y+padding, effItemWidth, effItemHeight);
+					drawProduct(item, productGraphics, effItemWidth, effItemHeight);
+					x += itemWidth;
+				}
 			}
 		}
 	}

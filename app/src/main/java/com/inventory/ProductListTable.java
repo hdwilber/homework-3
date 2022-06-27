@@ -153,14 +153,16 @@ public class ProductListTable extends JPanel implements ActionListener {
 	JTable table;
 	ProductListModel model;
 	Inventory inventory;
+	InventoryManager manager;
 	StockProductDetails details;
 	private final String ACTION_DISPLAY_STOCK = "DISPLAY_STOCK";
 	private final String ACTION_REQUEST = "ACTION_REQUEST";
 	private final String ACTION_DELETE = "ACTION_DELETE";
 
-	public ProductListTable(Inventory i, List<Provider> providers) {
+	public ProductListTable(Inventory i, InventoryManager m, List<Provider> providers) {
 		super();
 		inventory = i;
+		manager = m;
 		details = new StockProductDetails(i);
 		model = new ProductListModel(providers);
 		table = new JTable(model);
@@ -216,7 +218,8 @@ public class ProductListTable extends JPanel implements ActionListener {
 		if (event.getActionCommand() == ACTION_DISPLAY_STOCK) {
 			System.out.println("DISPLAY STOCK: " + table.getSelectedRow());
 		} else if(event.getActionCommand() == ACTION_REQUEST) {
-			System.out.println("REQUEST: " + table.getSelectedRow());
+			Product product = model.getRowAt(table.getSelectedRow());
+			manager.showEditRequestDialog(product);
 		} else if(event.getActionCommand() == ACTION_DELETE) {
 			System.out.println("DELETE: " + table.getSelectedRow());
 		}

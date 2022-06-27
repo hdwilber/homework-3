@@ -39,7 +39,7 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 
 		inventory = new Inventory();
 		status = new InventoryStatus(inventory);
-		productsTable = new ProductListTable(inventory, inventory.providers);
+		productsTable = new ProductListTable(inventory, this, inventory.providers);
 		depotStatus = new DepotStatus(inventory.depot);
 
 		setupContent();
@@ -115,11 +115,15 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 		setVisible(true);
 	}
 
+	public void showEditRequestDialog(Product p) {
+		editRequestDialog.setData(null, inventory.providers, p);
+		editRequestDialog.setVisible(true);
+	}
 	
 	@Override
 	public void onEditDialogComplete(EditDialog dialog, T original, T data) {
 		if (data instanceof Product) {
-			((EditProductDialog)dialog).addToProvider();
+//			((EditProductDialog)dialog).addToProvider();
 		} else if (data instanceof InventoryRequest) {
 			inventory.addRequest((InventoryRequest)original, (InventoryRequest)data);
 		} else if (data instanceof Provider) {
