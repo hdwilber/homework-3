@@ -1,11 +1,8 @@
 package com.inventory;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.util.Arrays;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -18,13 +15,15 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
 import javax.swing.ListCellRenderer;
-import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
-class PathStatusItem extends JLabel implements ListCellRenderer<TransferRequest> {
+import com.inventory.taskrequest.TaskExecutor;
+import com.inventory.taskrequest.TaskRequest;
+import com.inventory.taskrequest.TaskRequestEventListener;
+
+class PathStatusItem extends JLabel implements ListCellRenderer<TaskRequest> {
 	private static final long serialVersionUID = 1L;
 	public static Color[] palette = {
 			new Color(Integer.valueOf("5f66fb", 16)),
@@ -40,34 +39,40 @@ class PathStatusItem extends JLabel implements ListCellRenderer<TransferRequest>
 		setOpaque(true);
 	}
 	@Override
-	public Component getListCellRendererComponent(JList<? extends TransferRequest> list, TransferRequest value,
+	public Component getListCellRendererComponent(JList<? extends TaskRequest> list, TaskRequest value,
 			int index, boolean isSelected, boolean cellHasFocus) {
-		Color c = palette[value.priority.getValue()];
-		setText(value.getLabel());
+		if (value != null) {
+			Color c = palette[value.getPriority().getValue()];
+			setText(value.getLabel());
+			setFont(getFont().deriveFont(1, 10.0f));
+			setBorder(BorderFactory.createCompoundBorder(new LineBorder(c, 2), new EmptyBorder(8, 8, 8, 8)));
+		} else {
+		}
 		setHorizontalTextPosition(CENTER);
 		setVerticalTextPosition(TOP);
-		setFont(getFont().deriveFont(1, 10.0f));
-		setToolTipText(value.id);
-		setBorder(BorderFactory.createCompoundBorder(new LineBorder(c, 2), new EmptyBorder(8, 8, 8, 8)));
 		invalidate();
 		return this;
 	}
 }
 
-class PathStatusModel extends AbstractListModel<TransferRequest> {
+class PathStatusModel extends AbstractListModel<TaskRequest> {
 	private static final long serialVersionUID = 1L;
-	PriorityBlockingQueue<TransferRequest> list;
-	TransferRequest[] arrayList;
+	PriorityBlockingQueue<TaskRequest> list;
+	TaskRequest[] arrayList;
 	boolean right;
-	public PathStatusModel(PriorityBlockingQueue<TransferRequest> l, boolean r) {
+	public PathStatusModel(PriorityBlockingQueue<TaskRequest> l, boolean r) {
 		list = l;
 		right = r;
 		updateList();
 	}
 
 	public void getArrayList() {
-		TransferRequest[] aux = list.toArray(TransferRequest[]::new);
-		Arrays.sort(aux);
+		TaskRequest[] aux = list.toArray(TaskRequest[]::new);
+    Arrays.sort(aux);
+    //System.out.println("LISTING ARRAY LIST: " + (aux.length));
+    //for(int i = 0; i < aux.length; i++) {
+      //System.out.println(aux[i]);
+    //}
 		if (aux.length > 0) {
 			if (aux.length >= 5) {
 				arrayList = Arrays.copyOfRange(aux, 0, 5);
@@ -85,7 +90,7 @@ class PathStatusModel extends AbstractListModel<TransferRequest> {
 	}
 
 	@Override
-	public TransferRequest getElementAt(int index) {
+	public TaskRequest getElementAt(int index) {
 		if (index < arrayList.length) {
 			return arrayList[right ? arrayList.length - index -1 : index];
 		}
@@ -102,11 +107,11 @@ class PathStatus extends JPanel {
 	private static final long serialVersionUID = 1L;
 	Image icon;
 	PathStatusModel requestsModel;
-	JList<TransferRequest> listView;
+	JList<TaskRequest> listView;
 	boolean right;
 	String iconResource;
 
-	public PathStatus(String ic, PriorityBlockingQueue<TransferRequest> l, boolean r) {
+	public PathStatus(String ic, PriorityBlockingQueue<TaskRequest> l, boolean r) {
 		super();
 		requestsModel = new PathStatusModel(l, r);
 		iconResource = ic;
@@ -119,7 +124,7 @@ class PathStatus extends JPanel {
 		setMinimumSize(new Dimension(0, 75));
 		setMaximumSize(new Dimension(2000, 75));
 
-		listView = new JList<TransferRequest>();
+		listView = new JList<TaskRequest>();
 		listView.setLayoutOrientation(JList.HORIZONTAL_WRAP);
 		listView.setAlignmentX(r ? Component.RIGHT_ALIGNMENT : Component.LEFT_ALIGNMENT);
 		listView.setCellRenderer(renderer);
@@ -143,11 +148,11 @@ class PathStatus extends JPanel {
 	}
 }
 
-class TransferStatus extends JPanel implements InventoryEventListener {
+class TransferStatus extends JPanel implements TaskRequestEventListener {
 	private static final long serialVersionUID = 1L;
 	PathStatus topPath;
 	PathStatus bottomPath;
-	public TransferStatus(String ts, String bs, String ticon, String bicon, PriorityBlockingQueue<TransferRequest> ti, PriorityBlockingQueue<TransferRequest> bi) { 
+	public TransferStatus(String ts, String bs, String ticon, String bicon, PriorityBlockingQueue<TaskRequest> ti, PriorityBlockingQueue<TaskRequest> bi) { 
 		BoxLayout layout = new BoxLayout(this, BoxLayout.PAGE_AXIS);
 		setLayout(layout);
 		JPanel sep = new JPanel();
@@ -197,7 +202,9 @@ class TransferStatus extends JPanel implements InventoryEventListener {
 	}
 
 	@Override
-	public void onTransferRequestUpdate() {
+	public void onTaskRequestEvent(TaskExecutor source, TaskRequestEventType type, TaskRequest t) {
+		// TODO Auto-generated method stub
+		System.out.println("RECEIVED EVENT: " + type + " - " + t);
 		topPath.updateList();
 		bottomPath.updateList();
 	}
@@ -222,8 +229,8 @@ public class InventoryStatus extends JPanel {
 				"Orden de Entrada",
 				"/icons/request.png",
 				"/icons/inboundorder.png",
-				p.requestsQueue,
-				inventory.inboundOrders
+				p.getQueue(),
+				inventory.requestsProcessor.getQueue()
 				);
 
 		rightStatus = new TransferStatus(
@@ -231,8 +238,8 @@ public class InventoryStatus extends JPanel {
 				"Orden de Salida",
 				"/icons/request.png",
 				"/icons/outboundorder.png",
-				inventory.stockTransfers,
-				inventory.store.outboundOrders
+				inventory.store.getQueue(),
+				inventory.outboundsProcessor.getQueue()
 				);
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
@@ -245,7 +252,8 @@ public class InventoryStatus extends JPanel {
 		add(rightStatus);
 		add(Box.createHorizontalStrut(16));
 		add(storeStatus);
-		inventory.addInventoryEventListener(leftStatus);
-		inventory.addInventoryEventListener(rightStatus);
+		inventory.requestsProcessor.addTaskRequestEventListener(leftStatus);
+		p.addTaskRequestEventListener(leftStatus);
+//		inventory.addInventoryEventListener(rightStatus);
 	}
 }

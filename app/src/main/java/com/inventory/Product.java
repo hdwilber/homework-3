@@ -9,7 +9,7 @@ enum ProductType {
 	CLEANING
 }
 public class Product {
-	String name;
+	private String name;
 	ProductType type;
 	Color color;
 	public static Color[] palette = {
@@ -23,7 +23,7 @@ public class Product {
 	public static int colorCount = 0;
 
 	public Product(String n, ProductType t)  {
-		name = n;
+		setName(n);
 		type = t;
 		if (colorCount >= palette.length) colorCount = 0;
 		color = palette[colorCount];
@@ -31,6 +31,14 @@ public class Product {
 	}
 	
 	public String toString() {
-		return name + (type != null ? "(" + type.toString() +")": "");
+		return getName() + (type != null ? "(" + type.toString() +")": "");
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String n) {
+		name = n;
 	}
 }

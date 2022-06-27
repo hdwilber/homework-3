@@ -1,7 +1,5 @@
 package com.inventory;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -13,6 +11,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
+
+import com.inventory.taskrequest.InventoryRequest;
+import com.inventory.taskrequest.InventoryStockTransfer;
 
 public class InventoryManager<T> extends JFrame implements EditDialogListener<T> {
 	private static final long serialVersionUID = 1L;
@@ -117,14 +118,14 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 	
 	@Override
 	public void onEditDialogComplete(EditDialog dialog, T original, T data) {
-		if (data instanceof Product) { 
+		if (data instanceof Product) {
 			((EditProductDialog)dialog).addToProvider();
-		} else if (data instanceof Request) {
-			inventory.addRequest((Request)original, (Request)data);
+		} else if (data instanceof InventoryRequest) {
+			inventory.addRequest((InventoryRequest)original, (InventoryRequest)data);
 		} else if (data instanceof Provider) {
 			inventory.addProvider((Provider)original, (Provider)data);
-		} else if (data instanceof StockTransfer) {
-			inventory.store.addStockTransfer((StockTransfer)data);
+		} else if (data instanceof InventoryStockTransfer) {
+			inventory.addStockTransfer((InventoryStockTransfer)data);
 		}
 		dialog.setVisible(false);
 		

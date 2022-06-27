@@ -102,7 +102,7 @@ class ProductListModel extends AbstractTableModel {
 		Product p = list.get(row);
 		if(p != null) {
 			if (column == 0) { 
-				return p.name;
+				return p.getName();
 			} else if (column == 1) {
 				return "-";
 			} else if (column == 2) {

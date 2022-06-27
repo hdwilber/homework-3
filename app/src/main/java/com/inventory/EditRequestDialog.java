@@ -19,10 +19,13 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.NumberFormatter;
 
+import com.inventory.taskrequest.InventoryRequest;
+import com.inventory.taskrequest.TaskRequestPriority;
 import com.inventory.utils.JListEnum;
 import com.inventory.utils.JListFromList;
 
-public class EditRequestDialog<T> extends EditDialog<Request, T> implements ListSelectionListener  {
+public class EditRequestDialog<T> extends EditDialog<InventoryRequest, T> implements ListSelectionListener  {
+	private static final long serialVersionUID = 1L;
 	List<Provider> providers;
 	List<Product> products;
 	
@@ -34,19 +37,19 @@ public class EditRequestDialog<T> extends EditDialog<Request, T> implements List
 	JListFromList<Product> productList;
 	JListFromList<Provider> providerList;
 	JFormattedTextField inputAmount;
-	JListEnum<TransferRequestPriority> inputPriority;
+	JListEnum<TaskRequestPriority> inputPriority;
 	
-	public <Request>EditRequestDialog(JFrame o, EditDialogListener<T> l) {
+	public <InventoryRequest>EditRequestDialog(JFrame o, EditDialogListener<T> l) {
 		super(o, l);
 		setTitle("Pedir");
-		inputPriority = new JListEnum<TransferRequestPriority>(TransferRequestPriority.class);
+		inputPriority = new JListEnum<TaskRequestPriority>(TaskRequestPriority.class);
 	}
 
 	public String getDialogTitle() {
 		return "Hacer Pedido";
 	}
 
-	public void setData(Request d, List<Provider> lp) {
+	public void setData(InventoryRequest d, List<Provider> lp) {
 		providers = lp;
 		
 		providerList = new JListFromList<Provider>(Provider[].class, lp);
@@ -116,12 +119,12 @@ public class EditRequestDialog<T> extends EditDialog<Request, T> implements List
 	}
 
 	@Override
-	public Request getData() {
+	public InventoryRequest getData() {
 		Provider provider = providerList.getSelectedValue();
 		Product product = productList.getSelectedValue();
 		int amount = (int) inputAmount.getValue();
-		TransferRequestPriority priority = inputPriority.getSelectedValue();
-		return new Request(provider, product, amount, priority);
+		TaskRequestPriority priority = inputPriority.getSelectedValue();
+		return new InventoryRequest(product, amount, priority);
 	}
 
 	@Override

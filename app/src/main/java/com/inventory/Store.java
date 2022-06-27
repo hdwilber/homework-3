@@ -1,57 +1,25 @@
 package com.inventory;
 
-import java.util.concurrent.PriorityBlockingQueue;
+import com.inventory.taskrequest.InventoryOutbound;
+import com.inventory.taskrequest.InventoryStockTransfer;
+import com.inventory.taskrequest.TaskRequest;
+import com.inventory.taskrequest.TaskRequestProcessor;
 
-import com.inventory.utils.ProcessRequestChecker;
-
-class Store extends ProcessRequestChecker {
-	PriorityBlockingQueue<TransferRequest> outboundOrders;
+class Store extends TaskRequestProcessor {
 	Inventory inventory;
-	public Store(Inventory i) {
+	public Store(Inventory i, int c, int cp) {
+		super(c, cp);
 		inventory = i;
-		outboundOrders = new PriorityBlockingQueue<TransferRequest>();
-		startChecker();
 	}
 
-	public void receiveOutboundOrder(OutboundOrder o) {
-		o.setStatus(TransferRequestStatus.RECEIVED);
-		outboundOrders.add(o);
-		inventory.fireInventoryEvent();
-		continueChecker();
+	public void addStockTransfer(InventoryStockTransfer st) {
+		sendTask(inventory.outboundsProcessor, st);
 	}
 
-	public void addStockTransfer(StockTransfer st) {
-		inventory.receiveStockTransfer(st);
-	}
-
-	@Override
-	public void processRequest() {
-		try {
-			OutboundOrder outboundOrder = (OutboundOrder)outboundOrders.element();
-			try {
-				inventory.fireInventoryEvent();
-				Thread.sleep(getProcessingTime(outboundOrders));
-				outboundOrder.setStatus(TransferRequestStatus.PROCESSED);
-				outboundOrders.poll();
-				inventory.fireInventoryEvent();
-
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} catch(Exception error) {
-			pauseChecker();
-		}
-
-	}
-
-	private long getProcessingTime(PriorityBlockingQueue<TransferRequest> o) {
-		return 2500;
-	}
-
-	@Override
-	public boolean shouldPauseChecker() {
-		return outboundOrders.size() == 0;
+	public long getProcessingTime(TaskRequest tr) {
+		InventoryOutbound ir = (InventoryOutbound)tr;
+		long time = ((long)(Math.random() * 1000)) * ir.getAmount();
+		return time;
 	}
 }
 

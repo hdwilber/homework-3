@@ -2,13 +2,12 @@ package com.inventory;
 
 import java.util.ArrayList;
 import java.util.EventListener;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import javax.swing.event.EventListenerList;
 
-import com.inventory.utils.ProcessRequestChecker;
+import com.inventory.taskrequest.*;
 
 interface InventoryEventListener extends EventListener {
 	public void onTransferRequestUpdate();
@@ -17,181 +16,119 @@ interface StoreStatusListener extends EventListener {
 	public void onStoreStatusUpdate();
 }
 
-public class Inventory extends TransferRequestProcessor {
+public class Inventory {
 	Depot depot;
 	List<Provider> providers;
 	Store store;
 
-	InventoryStatus status;
-	List<TransferRequest> allEvents;
-	PriorityBlockingQueue<TransferRequest> requests;
-	PriorityBlockingQueue<TransferRequest> inboundOrders;
-	PriorityBlockingQueue<TransferRequest> stockTransfers;
-	PriorityBlockingQueue<TransferRequest> outboundOrders;
-    EventListenerList listenerList = new EventListenerList();
-    EventListenerList storeListenerList = new EventListenerList();
+	EventListenerList listenerList = new EventListenerList();
+	EventListenerList storeListenerList = new EventListenerList();
 
-    ProcessRequestChecker stockTransferChecker = new ProcessRequestChecker() {
-    	@Override
-    	public void processRequest() {
-    		try {
-    			StockTransfer stockTransfer = (StockTransfer)stockTransfers.element();
-    			try {
-    				Thread.sleep(getProcessingTime(stockTransfer));
-    				stockTransfer.setStatus(TransferRequestStatus.PROCESSED);
+	public TaskRequestProcessor requestsProcessor = new TaskRequestProcessor(4, 1) {
+		public long getProcessingTime(TaskRequest io) {
+			InventoryRequest ir = (InventoryRequest)io;
+			long time = ((long)(Math.random() * 1000)) * ir.getAmount();
+			return time;
+		}
+		@Override
+		public void onTaskRequestComplete(TaskRequest r) {
+			depot.receiveInventoryInbound((InventoryInbound)r);
+		}
+	};
 
-    				// DEPOSIT
-    				allEvents.add(stockTransfers.poll());
-    				fireInventoryEvent("BOTTOM", stockTransfers);
-    				stockTransfers.poll();
+	public TaskRequestProcessor outboundsProcessor = new TaskRequestProcessor(4, 1) {
+		public long getProcessingTime(TaskRequest io) {
+			InventoryStockTransfer ir = (InventoryStockTransfer)io;
+			long time = ((long)(Math.random() * 1000)) * ir.getAmount();
+			return time;
+		}
+		@Override
+		public void onTaskRequestComplete(TaskRequest r) {
+			List<InventoryOutbound> res = depot.receiveStockTransfer((InventoryStockTransfer)r);
+			if (res != null) {
+				res.forEach(order -> {
+					sendTask(store, order);
+				});
+			}
+		}
+	};
 
-    				if (depot.canMeetStockTransfer(stockTransfer)) {
-    					System.out.println("WE HAVE ENOUGH");
-    					List<OutboundOrder> orders = depot.receiveStockTransfer(stockTransfer);
-    					Iterator<OutboundOrder> iter = orders.iterator();
-    					while(iter.hasNext()) {
-    						store.receiveOutboundOrder(iter.next());
-    					}
-    				} else {
-    					System.out.println("WE DO NOT HAVE ENOUGH ITEMS");
-    					OutboundOrder cancelledOrder = new OutboundOrder(stockTransfer);
-    					stockTransfer.setStatus(TransferRequestStatus.REJECTED);
-    					store.receiveOutboundOrder(cancelledOrder);
-    				}
-    			} catch (InterruptedException e) {
-    				e.printStackTrace();
-    			}
-    		} catch(Exception error) {
-    			pauseChecker();
-    		}
-    	}
-
-    	@Override
-    	public boolean shouldPauseChecker() {
-    		return stockTransfers.size() == 0;
-    	}
-
-    };
-
-   
 	public Inventory() {
-		super(2, 1);
+		super();
 		depot = new Depot(10, 10, 4);
-		store = new Store(this);
+		store = new Store(this, 3, 3);
 		providers = new ArrayList<Provider>();
-		Provider provider  = new Provider(this, "Proveedor Jefe", 5, 5);
+		Provider provider  = new Provider(this, "Proveedor Jefe", 3, 1);
 		provider.addProduct(new Product("Producto 1", ProductType.DEHYDRATED));
 		provider.addProduct(new Product("Producto 2", ProductType.CLEANING));
 		provider.addProduct(new Product("Producto 3", ProductType.FRESH));
 		providers.add(provider);
 
-		allEvents = new ArrayList<TransferRequest>();
-		requests = new PriorityBlockingQueue<TransferRequest>();
-		inboundOrders = new PriorityBlockingQueue<TransferRequest>();
-		stockTransfers = new PriorityBlockingQueue<TransferRequest>();
-		outboundOrders = new PriorityBlockingQueue<TransferRequest>();
-
-		
-		status = new InventoryStatus(this);
-		stockTransferChecker.startChecker();
-		
-
-		addRequest(null, new Request(provider, provider.products.get(0), 2, TransferRequestPriority.LOW));
-		addRequest(null, new Request(provider, provider.products.get(1), 1, TransferRequestPriority.MIDDLE));
-		addRequest(null, new Request(provider, provider.products.get(2), 2, TransferRequestPriority.HIGH));
-		addRequest(null, new Request(provider, provider.products.get(1), 2, TransferRequestPriority.VERY_HIGH));
-		addRequest(null, new Request(provider, provider.products.get(1), 1, TransferRequestPriority.VERY_HIGH));
-		addRequest(null, new Request(provider, provider.products.get(2), 2, TransferRequestPriority.ALL_MIGHTY));
-		addRequest(null, new Request(provider, provider.products.get(1), 2, TransferRequestPriority.LOW));
-		addRequest(null, new Request(provider, provider.products.get(1), 4, TransferRequestPriority.HIGH));
-		addRequest(null, new Request(provider, provider.products.get(1), 3, TransferRequestPriority.VERY_HIGH));
-		addRequest(null, new Request(provider, provider.products.get(2), 2, TransferRequestPriority.ALL_MIGHTY));
-		addRequest(null, new Request(provider, provider.products.get(1), 1, TransferRequestPriority.LOW));
-		addRequest(null, new Request(provider, provider.products.get(1), 2, TransferRequestPriority.HIGH));
-		addRequest(null, new Request(provider, provider.products.get(1), 4, TransferRequestPriority.VERY_HIGH));
-		addRequest(null, new Request(provider, provider.products.get(2), 5, TransferRequestPriority.ALL_MIGHTY));
-		addRequest(null, new Request(provider, provider.products.get(1), 2, TransferRequestPriority.LOW));
-		addRequest(null, new Request(provider, provider.products.get(1), 2, TransferRequestPriority.HIGH));
-
-
+		//		Product p = provider.products.get(1);
+		//		requestsProcessor.sendTask(provider, new InventoryRequest(p, 1));
+		//		requestsProcessor.sendTask(provider, new InventoryRequest(p, 3));
+		//		requestsProcessor.sendTask(provider, new InventoryRequest(p, 4));
+		//		requestsProcessor.sendTask(provider, new InventoryRequest(p, 2));
+		//		requestsProcessor.sendTask(provider, new InventoryRequest(p, 3));
+		//		requestsProcessor.sendTask(provider, new InventoryRequest(p, 1));
+		//		requestsProcessor.sendTask(provider, new InventoryRequest(p, 3, TaskRequestPriority.MIDDLE));
+//		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(0), 2, TaskRequestPriority.LOW));
+//		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 1, TaskRequestPriority.MIDDLE));
+//		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.HIGH));
+//		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.VERY_HIGH));
+//		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 1, TaskRequestPriority.VERY_HIGH));
+//		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.ALL_MIGHTY));
+//		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.LOW));
+//		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 4, TaskRequestPriority.HIGH));
+//		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 3, TaskRequestPriority.VERY_HIGH));
+//		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.ALL_MIGHTY));
+//		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 1, TaskRequestPriority.LOW));
+//		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.HIGH));
+//		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 4, TaskRequestPriority.VERY_HIGH));
+//		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 5, TaskRequestPriority.ALL_MIGHTY));
+//		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.LOW));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 25, TaskRequestPriority.HIGH));
 	}
 
-    public void addInventoryEventListener(InventoryEventListener l) {
-        listenerList.add(InventoryEventListener.class, l);
-    }
+	public void addInventoryEventListener(InventoryEventListener l) {
+		listenerList.add(InventoryEventListener.class, l);
+	}
 
-    public void removeListDataListener(InventoryEventListener l) {
-        listenerList.remove(InventoryEventListener.class, l);
-    }
+	public void removeListDataListener(InventoryEventListener l) {
+		listenerList.remove(InventoryEventListener.class, l);
+	}
 
-    public void addStorageStatusListener(StoreStatusListener l) {
-        storeListenerList.add(StoreStatusListener.class, l);
-    }
+	public void addStorageStatusListener(StoreStatusListener l) {
+		storeListenerList.add(StoreStatusListener.class, l);
+	}
 
-    public void removeListDataListener(StoreStatusListener l) {
-        storeListenerList.remove(StoreStatusListener.class, l);
-    }
-    
-    public void fireStoreStatusUpdate() {
-    	Object[] listeners = storeListenerList.getListenerList();
-    	for (int i = listeners.length-2; i >= 0; i-=2) {
-    		if (listeners[i] == StoreStatusListener.class) {
-    			((StoreStatusListener)listeners[i+1]).onStoreStatusUpdate();
-    		}
-    	}
-    }
+	public void removeListDataListener(StoreStatusListener l) {
+		storeListenerList.remove(StoreStatusListener.class, l);
+	}
 
-    public void fireInventoryEvent() {
-    	fireInventoryEvent(null, null);
-    }
-    public void fireInventoryEvent(String s, PriorityBlockingQueue<TransferRequest> l) {
-    	Object[] listeners = listenerList.getListenerList();
-    	for (int i = listeners.length-2; i >= 0; i-=2) {
-    		if (listeners[i] == InventoryEventListener.class) {
-    			((InventoryEventListener)listeners[i+1]).onTransferRequestUpdate();
-    		}
-    	}
-    }
-
-    public void receiveStockTransfer(StockTransfer st) {
-		st.setStatus(TransferRequestStatus.RECEIVED);
-		stockTransfers.add(st);
-		fireInventoryEvent("BOTTOM", stockTransfers);
-		stockTransferChecker.continueChecker();
-    }
-    
-    int totalIn = 0;
-    public void receiveInboundOrder(InboundOrder in) {
-    	totalIn += in.amount;
-    	in.setStatus(TransferRequestStatus.RECEIVED);
-
-    	fireStoreStatusUpdate();
-		if (!processTransferRequest(in)) {
-			inboundOrders.add(in);
+	public void fireStoreStatusUpdate() {
+		Object[] listeners = storeListenerList.getListenerList();
+		for (int i = listeners.length-2; i >= 0; i-=2) {
+			if (listeners[i] == StoreStatusListener.class) {
+				((StoreStatusListener)listeners[i+1]).onStoreStatusUpdate();
+			}
 		}
-    	fireStoreStatusUpdate();
-		fireInventoryEvent();
-    }
-    
-    public void addProvider(Provider o, Provider p) {
-    	addOrReplace(providers, o, p);
-    }
-	
-	public void addRequest(Request o, Request p) {
-		allEvents.add(p);
-		p.provider.receiveRequest(p);
-	}
-	
-	public void addInboundOrder(InboundOrder o, InboundOrder p) {
-		inboundOrders.add(p);
-		fireInventoryEvent("BOTTOM", inboundOrders);
-		
-		receiveInboundOrder(p);
 	}
 
-	public void addOutboundOrder(OutboundOrder o, OutboundOrder p) {
-		outboundOrders.add(p);
-		fireInventoryEvent("BOTTOM", outboundOrders);
+	public void fireInventoryEvent() {
+		fireInventoryEvent(null, null);
+	}
+	public void fireInventoryEvent(String s, PriorityBlockingQueue<TaskRequest> l) {
+		Object[] listeners = listenerList.getListenerList();
+		for (int i = listeners.length-2; i >= 0; i-=2) {
+			if (listeners[i] == InventoryEventListener.class) {
+				((InventoryEventListener)listeners[i+1]).onTransferRequestUpdate();
+			}
+		}
+	}
+
+	public void addProvider(Provider o, Provider p) {
+		addOrReplace(providers, o, p);
 	}
 
 	public <T> void addOrReplace(List<T> l, T o, T n) {
@@ -204,34 +141,11 @@ public class Inventory extends TransferRequestProcessor {
 		}
 	}
 
-	public long getProcessingTime(InboundOrder io) {
-//		long time = ((long)(Math.random() * 1000)) * io.amount;
-		long time = 2500;
-		return time;
+	public void addRequest(InventoryRequest original, InventoryRequest data) {
+		requestsProcessor.sendTask(providers.get(0), data);
 	}
 
-	public long getProcessingTime(StockTransfer io) {
-//		long time = ((long)(Math.random() * 500)) * io.amount;
-		long time = 2500;
-		return time;
-	}
-
-	@Override
-	public void onTaskComplete(TransferRequestExecutor task) {
-		task.request.setStatus(TransferRequestStatus.PROCESSING);
-		if (inboundOrders.size() > 0) {
-			TransferRequest pausedRequest = inboundOrders.poll();
-			if (!processTransferRequest(pausedRequest)) {
-				inboundOrders.add(pausedRequest);
-			} else {
-			}
-			fireInventoryEvent();
-		}
-		fireStoreStatusUpdate();
-		depot.receiveInboundOrder((InboundOrder)task.request);
-
-//		InboundOrder result = new InboundOrder((Request)task.request);
-//		inventory.receiveInboundOrder(result);
-		
+	public void addStockTransfer(InventoryStockTransfer data) {
+		store.sendTask(outboundsProcessor, data);
 	}
 }

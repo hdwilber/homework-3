@@ -4,10 +4,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.inventory.taskrequest.InventoryInbound;
+import com.inventory.taskrequest.InventoryOutbound;
+import com.inventory.taskrequest.InventoryStockTransfer;
+
 class InventoryItem {
 	int amount;
-	InboundOrder order;
-	public InventoryItem(InboundOrder i, int a) {
+	InventoryInbound order;
+	public InventoryItem(InventoryInbound i, int a) {
 		order = i;
 		amount = a;
 	}
@@ -43,7 +47,7 @@ public class Shelf {
 	}
 	
 	// @param(a): required amount. Not necessary same than order.amount
-	public int storeItems(InboundOrder i, int a) {
+	public int storeItems(InventoryInbound i, int a) {
 		int available = getAvailableSpace();
 		if (available > 0) {
 			int leftSpace = available - a;
@@ -58,13 +62,13 @@ public class Shelf {
 	
 	// @param(a): required amount. Not necessary same than order.amount
 	// Returns the amount left to complete @param(a)
-	public int checkStockAvailability(StockTransfer st, int a) {
+	public int checkStockAvailability(InventoryStockTransfer st, int a) {
 		Iterator<InventoryItem> it = items.iterator();
 		int left = a;
 		while(it.hasNext()) {
 			InventoryItem item = it.next();
 			Product p = item.order.request.getProduct();
-			if (st.product.name.equals(p.name)) {
+			if (st.getProduct().getName().equals(p.getName())) {
 				left -= item.amount;
 			}
 			if (left <= 0) {
@@ -74,15 +78,15 @@ public class Shelf {
 		return left <= 0 ? 0 : left;
 	}
 
-	public OutboundOrder transferItems(StockTransfer o, int a) {
-		OutboundOrder order = new OutboundOrder(o);
+	public InventoryOutbound transferItems(InventoryStockTransfer o, int a) {
+		InventoryOutbound order = new InventoryOutbound(o);
 		order.setAmount(0);
 		Iterator<InventoryItem> it = items.iterator();
 		int left = a;
 		while(it.hasNext()) {
 			InventoryItem item = it.next();
 			Product p = item.order.request.getProduct();
-			if (o.product.name.equals(p.name)) {
+			if (o.getProduct().getName().equals(p.getName())) {
 				int itemLeft = item.amount - left;
 				if (itemLeft <= 0) {
 					items.remove(item);
@@ -111,7 +115,7 @@ public class Shelf {
 		while(it.hasNext()) { 
 			InventoryItem item = it.next();
 			Product product = item.order.request.getProduct();
-			if (product.name.equals(p.name)) {
+			if (product.getName().equals(p.getName())) {
 				list.add(item);
 			}
 		}

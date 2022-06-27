@@ -6,6 +6,11 @@ import java.util.List;
 
 import javax.swing.event.EventListenerList;
 
+import com.inventory.taskrequest.InventoryInbound;
+import com.inventory.taskrequest.InventoryOutbound;
+import com.inventory.taskrequest.InventoryStockTransfer;
+import com.inventory.taskrequest.TaskRequestStatus;
+
 interface DepotEventListener extends EventListener {
 	public void onDepotStoreComplete();
 	public void onDepotItemStoreComplete();
@@ -64,7 +69,7 @@ public class Depot {
 		return count;
 	}
 	
-	public boolean store(InboundOrder o) {
+	public boolean store(InventoryInbound o) {
 		if (o.amount <= getAvailableSpace()) {
 			int left = o.amount;
 			for(int i = 0; i < shelves.length; i++) {
@@ -92,8 +97,8 @@ public class Depot {
 		return list;
 	}
 
-	public boolean canMeetStockTransfer(StockTransfer o) {
-		int left = o.amount;
+	public boolean canMeetStockTransfer(InventoryStockTransfer o) {
+		int left = o.getAmount();
 		for(int i = 0; i < shelves.length; i++) {
 			Shelf shelf = shelves[i];
 			left = shelf.checkStockAvailability(o, left);
@@ -104,12 +109,12 @@ public class Depot {
 		return left <= 0;
 	}
 	
-	public List<OutboundOrder> transfer(StockTransfer st) {
-		List<OutboundOrder> result = new ArrayList<OutboundOrder>();
-		int left = st.amount;
+	public List<InventoryOutbound> transfer(InventoryStockTransfer st) {
+		List<InventoryOutbound> result = new ArrayList<InventoryOutbound>();
+		int left = st.getAmount();
 		for(int i = 0; i < shelves.length; i++) {
 			Shelf shelf = shelves[i];
-			OutboundOrder subOrder = shelf.transferItems(st, left);
+			InventoryOutbound subOrder = shelf.transferItems(st, left);
 			if (subOrder != null) {
 				result.add(subOrder);
 				left -= subOrder.amount;
@@ -122,21 +127,14 @@ public class Depot {
 		return result;
 	}
 	
-	int total = 0;
-	public boolean receiveInboundOrder(InboundOrder o) {
-		o.setStatus(TransferRequestStatus.PROCESSING);
-		boolean succeed = store(o);
-		o.setStatus(TransferRequestStatus.PROCESSED);
-		fireItemStoreComplete();
-		if (succeed) {
-			total += o.amount;
-		} else {
-			total -= o.amount;
-		}
-		return succeed;
+	public boolean receiveInventoryInbound(InventoryInbound i) {
+		i.setStatus(TaskRequestStatus.IN_PROGRESS);
+		store(i);
+		i.setStatus(TaskRequestStatus.COMPLETE);
+		return true;
 	}
-	
-	public List<OutboundOrder> receiveStockTransfer(StockTransfer st) {
+
+	public List<InventoryOutbound> receiveStockTransfer(InventoryStockTransfer st) {
 		boolean succeed = canMeetStockTransfer(st);
 		if(succeed) {
 			return transfer(st);

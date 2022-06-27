@@ -13,9 +13,11 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.NumberFormatter;
 
+import com.inventory.taskrequest.InventoryStockTransfer;
 import com.inventory.utils.JListFromList;
 
-public class EditStockTransferDialog<T> extends EditDialog<StockTransfer, T> implements ListSelectionListener{
+public class EditStockTransferDialog<T> extends EditDialog<InventoryStockTransfer, T> implements ListSelectionListener{
+	private static final long serialVersionUID = 1L;
 	List<Provider> providers;
 	List<Product> products;
 
@@ -35,7 +37,7 @@ public class EditStockTransferDialog<T> extends EditDialog<StockTransfer, T> imp
 	public String getDialogTitle() {
 		return "Transferir Stock";
 	}
-	public void setData(StockTransfer d, List<Provider> lp) {
+	public void setData(InventoryStockTransfer d, List<Provider> lp) {
 		providers = lp;
 		providerList = new JListFromList<Provider>(Provider[].class, lp);
 		int index = 0;
@@ -97,11 +99,10 @@ public class EditStockTransferDialog<T> extends EditDialog<StockTransfer, T> imp
 	}
 
 	@Override
-	public StockTransfer getData() {
-		Provider provider = providerList.getSelectedValue();
+	public InventoryStockTransfer getData() {
 		Product product = productList.getSelectedValue();
 		int amount = (int) inputAmount.getValue();
-		return new StockTransfer(product, amount);
+		return new InventoryStockTransfer(product, amount);
 	}
 
 	@Override
