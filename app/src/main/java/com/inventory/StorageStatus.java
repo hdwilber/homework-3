@@ -1,5 +1,8 @@
 package com.inventory;
 
+import java.awt.Component;
+
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -19,21 +22,28 @@ public class StorageStatus extends ItemStatus {
 	public StorageStatus(Inventory i) {
 		super(i.requestsProcessor, "/icons/storage.png", "ALMACEN");
 		inventory = i;
-		JPanel stats = new JPanel();
-		stats.setLayout(new BoxLayout(stats, BoxLayout.Y_AXIS));
+		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
-		inActiveTasksLabel = new JLabel("En Proceso: " + i.requestsProcessor.countActiveTasks());
-		inPausedTasksLabel = new JLabel("En Pausa: " + i.requestsProcessor.countPausedTasks());
-		queueTasksLabel = new JLabel("En Cola: " + i.requestsProcessor.countQueue());
-
-		stats.add(inActiveTasksLabel);
-		stats.add(inPausedTasksLabel);
-		stats.add(queueTasksLabel);
-		
+		JPanel outboundStats = new JPanel();
+		outboundStats.setLayout(new BoxLayout(outboundStats, BoxLayout.Y_AXIS));
+		inActiveTasksLabel = new JLabel("En Proceso: " + i.outboundsProcessor.countActiveTasks());
+		inPausedTasksLabel = new JLabel("En Pausa: " + i.outboundsProcessor.countPausedTasks());
+		queueTasksLabel = new JLabel("En Cola: " + i.outboundsProcessor.countQueue());
+		outboundStats.add(inActiveTasksLabel);
+		outboundStats.add(inPausedTasksLabel);
+		outboundStats.add(queueTasksLabel);
 		i.outboundsProcessor.addTaskRequestEventListener(this);
 		
-		add(stats, 0);
+		Component self = this.getComponent(0);
+		Component inboundStats = this.getComponent(1);
+		removeAll();
 		invalidate();
+
+		add(inboundStats);
+		add(Box.createHorizontalStrut(16));
+		add(self);
+		add(Box.createHorizontalStrut(16));
+		add(outboundStats);
 	}
 
 	@Override

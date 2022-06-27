@@ -26,11 +26,12 @@ class TaskRequestExecution implements Runnable, Comparable<TaskRequestExecution>
 		executor = e;
 		id = count;
 		count++;
-		timer = new Timer();
 	}
 	
 	public void suspend(){
-		timer.cancel();
+		if (timer != null) {
+			timer.cancel();
+		}
 		suspended = true;
 	}
 
@@ -53,6 +54,7 @@ class TaskRequestExecution implements Runnable, Comparable<TaskRequestExecution>
 	public void run() {  
 		current = Thread.currentThread();
 		if (!suspended) {
+			timer = new Timer();
 			timer.schedule(new TimerTask() {
 				@Override
 				public void run() {
