@@ -1,5 +1,7 @@
 package com.inventory;
 
+import java.awt.Color;
+
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -34,7 +36,9 @@ public class ItemStatus extends JPanel implements TaskRequestEventListener {
 		label.setHorizontalTextPosition(JLabel.CENTER);
 		label.setVerticalTextPosition(JLabel.BOTTOM);
 		label.setBorder(new EmptyBorder(10, 10, 10, 10));
+		label.setOpaque(false);
 		
+		setBackground(Color.WHITE);
 		JPanel stats = new JPanel();
 		stats.setLayout(new BoxLayout(stats, BoxLayout.Y_AXIS));
 
@@ -45,6 +49,7 @@ public class ItemStatus extends JPanel implements TaskRequestEventListener {
 		stats.add(processingLabel);
 		stats.add(pausedLabel);
 		stats.add(queueLabel);
+		stats.setBackground(Color.WHITE);
 
 		add(label);
 		add(stats);

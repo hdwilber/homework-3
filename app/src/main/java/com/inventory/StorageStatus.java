@@ -1,5 +1,6 @@
 package com.inventory;
 
+import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.Box;
@@ -39,6 +40,7 @@ public class StorageStatus extends ItemStatus {
 		removeAll();
 		invalidate();
 
+		outboundStats.setBackground(Color.WHITE);
 		add(inboundStats);
 		add(Box.createHorizontalStrut(16));
 		add(self);

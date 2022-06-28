@@ -1,5 +1,7 @@
 package com.inventory.taskrequest;
 
+import com.inventory.product.Product;
+
 public class InventoryOutbound extends TaskRequest {
 	public InventoryStockTransfer request;
 	public int amount;
@@ -26,6 +28,11 @@ public class InventoryOutbound extends TaskRequest {
 	
 	public int getAmount() {
 		return amount;
+	}
+	
+	@Override
+	public Product getProduct() {
+		return request.getProduct();
 	}
 
 }

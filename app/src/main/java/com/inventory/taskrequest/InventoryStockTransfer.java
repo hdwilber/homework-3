@@ -1,6 +1,6 @@
 package com.inventory.taskrequest;
 
-import com.inventory.Product;
+import com.inventory.product.Product;
 
 public class InventoryStockTransfer extends TaskRequest {
 	Product product;

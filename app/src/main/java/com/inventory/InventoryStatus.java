@@ -3,6 +3,7 @@ package com.inventory;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Image;
 import java.util.Arrays;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -16,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
+import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
@@ -23,8 +25,9 @@ import com.inventory.taskrequest.TaskExecutor;
 import com.inventory.taskrequest.TaskRequest;
 import com.inventory.taskrequest.TaskRequestEventListener;
 
-class PathStatusItem extends JLabel implements ListCellRenderer<TaskRequest> {
+class PathStatusItem extends JPanel implements ListCellRenderer<TaskRequest> {
 	private static final long serialVersionUID = 1L;
+	ImageIcon icon;
 	public static Color[] palette = {
 			new Color(Integer.valueOf("5f66fb", 16)),
 			new Color(Integer.valueOf("00c7e0", 16)),
@@ -34,22 +37,23 @@ class PathStatusItem extends JLabel implements ListCellRenderer<TaskRequest> {
 			new Color(Integer.valueOf("d16b6b", 16)),
 	};
 
-	public PathStatusItem(Image icon) {
-		super(new ImageIcon(icon));
-		setOpaque(true);
+	public PathStatusItem(Image i) {
+		super();
+		icon = new ImageIcon(i);
+//		setOpaque(false);
 	}
 	@Override
 	public Component getListCellRendererComponent(JList<? extends TaskRequest> list, TaskRequest value,
 			int index, boolean isSelected, boolean cellHasFocus) {
 		if (value != null) {
+			removeAll();
 			Color c = palette[value.getPriority().getValue()];
-			setText(value.getLabel());
-			setFont(getFont().deriveFont(1, 10.0f));
-			setBorder(BorderFactory.createCompoundBorder(new LineBorder(c, 2), new EmptyBorder(8, 8, 8, 8)));
+			Font font = getFont().deriveFont(1, 10.0f);
+			setBorder(BorderFactory.createCompoundBorder(new LineBorder(Color.WHITE, 1),
+					BorderFactory.createCompoundBorder(new LineBorder(c, 1), new EmptyBorder(4, 4, 4, 4))));
+			value.setContentInfo(this, icon, font);
 		} else {
 		}
-		setHorizontalTextPosition(CENTER);
-		setVerticalTextPosition(TOP);
 		invalidate();
 		return this;
 	}
@@ -112,6 +116,7 @@ class PathStatus extends JPanel {
 		requestsModel = new PathStatusModel(l, r);
 		iconResource = ic;
 		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+		setBackground(Color.WHITE);
 		Image image = new ImageIcon(getClass().getResource(ic)).getImage();
 		icon = image.getScaledInstance(25, 25,  java.awt.Image.SCALE_SMOOTH); // scale it smoothly  
 		PathStatusItem renderer = new PathStatusItem(icon);
@@ -151,6 +156,7 @@ class TransferStatus extends JPanel implements TaskRequestEventListener {
 	public TransferStatus(String ts, String bs, String ticon, String bicon, PriorityBlockingQueue<TaskRequest> ti, PriorityBlockingQueue<TaskRequest> bi) { 
 		BoxLayout layout = new BoxLayout(this, BoxLayout.PAGE_AXIS);
 		setLayout(layout);
+		setBackground(Color.WHITE);
 		JPanel sep = new JPanel();
 		sep.setBackground(Color.BLACK);
 		sep.setMinimumSize(new Dimension(getWidth(), 5));
@@ -161,16 +167,22 @@ class TransferStatus extends JPanel implements TaskRequestEventListener {
 		bottomPath = new PathStatus(bicon, bi, true);
 
 		JLabel topLabel = new JLabel(ts);
+		topLabel.setOpaque(false);
 		JLabel bottomLabel = new JLabel(bs);
+		bottomLabel.setOpaque(false);
 		
 		JPanel topPanel = new JPanel();
+		topPanel.setBackground(Color.WHITE);
 		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.PAGE_AXIS));
 
 		JPanel bottomPanel = new JPanel();
+		bottomPanel.setBackground(Color.WHITE);
 		bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.PAGE_AXIS));
 		
 		JPanel topLegend = new JPanel();
 		JPanel bottomLegend = new JPanel();
+		topLegend.setBackground(Color.WHITE);
+		bottomLegend.setBackground(Color.WHITE);
 		topLegend.setLayout(new BoxLayout(topLegend,BoxLayout.PAGE_AXIS));
 		topLegend.add(topLabel);
 		topLegend.add(new JLabel(new ImageIcon(getClass().getResource("/icons/arrow-left.png"))));
@@ -215,6 +227,7 @@ public class InventoryStatus extends JPanel {
 
 	public InventoryStatus(Inventory inventory) {
 		Provider p = inventory.providers.get(0);
+		setBackground(Color.WHITE);
 		providerStatus = new ProviderStatus(p);
 		storageStatus = new StorageStatus(inventory);
 		storeStatus = new StoreStatus(inventory.store);
@@ -222,8 +235,8 @@ public class InventoryStatus extends JPanel {
 		leftStatus = new TransferStatus(
 				"Pedido",
 				"Orden de Entrada",
-				"/icons/request.png",
-				"/icons/inboundorder.png",
+				"/icons/request-white.png",
+				"/icons/inboundorder-white.png",
 				p.getQueue(),
 				inventory.requestsProcessor.getQueue()
 				);
@@ -231,7 +244,7 @@ public class InventoryStatus extends JPanel {
 		rightStatus = new TransferStatus(
 				"Transferencia",
 				"Orden de Salida",
-				"/icons/request.png",
+				"/icons/request-white.png",
 				"/icons/outboundorder.png",
 				inventory.store.getQueue(),
 				inventory.outboundsProcessor.getQueue()

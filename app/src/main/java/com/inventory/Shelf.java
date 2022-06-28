@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import com.inventory.product.Product;
 import com.inventory.taskrequest.InventoryInbound;
 import com.inventory.taskrequest.InventoryOutbound;
 import com.inventory.taskrequest.InventoryStockTransfer;
@@ -86,7 +87,7 @@ public class Shelf {
 	}
 
 	public InventoryOutbound transferItems(InventoryStockTransfer o, int a) {
-		System.out.println("TRASNFERING " + a);
+//		System.out.println("TRASNFERING " + a);
 		InventoryOutbound order = new InventoryOutbound(o);
 		order.setAmount(0);
 		int left = a;
@@ -94,16 +95,16 @@ public class Shelf {
 			Iterator<InventoryItem> it = items.iterator();
 			while(it.hasNext()) {
 				InventoryItem item = it.next();
-				System.out.println("Current Item " + item.toString());
+//				System.out.println("Current Item " + item.toString());
 				Product p = item.order.request.getProduct();
 				if (o.getProduct().getName().equals(p.getName())) {
 					int itemLeft = item.amount - left;
 					if (itemLeft <= 0) {
-						System.out.println("Will be removed: " + itemLeft);
+//						System.out.println("Will be removed: " + itemLeft);
 						it.remove();
 						left -= item.amount;
 					} else {
-						System.out.println("there are still: " + itemLeft);
+//						System.out.println("there are still: " + itemLeft);
 						left -= (item.amount - itemLeft);
 						item.setAmount(itemLeft);
 					}
@@ -117,11 +118,11 @@ public class Shelf {
 			depot.fireItemStoreComplete();
 			if (left != a) {
 				int amount = left >= 0 ? a - left : a;
-				System.out.println("The new amount for outbound: " + amount);
+//				System.out.println("The new amount for outbound: " + amount);
 				order.setAmount(amount);
 				return order;
 			} else {
-				System.out.println("Should return null for: " + order.getAmount() );
+//				System.out.println("Should return null for: " + order.getAmount() );
 			}
 			return null;
 		}

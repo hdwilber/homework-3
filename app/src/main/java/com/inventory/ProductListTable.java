@@ -22,6 +22,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
+import com.inventory.product.Product;
+
 class ActionsColumnRenderer extends JPanel implements TableCellRenderer  {
 	private static final long serialVersionUID = 1L;
 	JPanel panel;
@@ -106,7 +108,7 @@ class ProductListModel extends AbstractTableModel {
 			} else if (column == 1) {
 				return "-";
 			} else if (column == 2) {
-				return p.type;
+				return p.getType();
 			}
 		}
 		// TODO Auto-generated method stub

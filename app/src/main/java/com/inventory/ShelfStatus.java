@@ -13,7 +13,7 @@ public class ShelfStatus {
 	}
 
 	public void drawProduct(InventoryItem item, Graphics g, int w, int h) {
-		g.setColor(item.order.request.getProduct().color);
+		g.setColor(item.order.request.getProduct().getColor());
 		if (item.order.getStatus() == TaskRequestStatus.COMPLETE) {
 			g.fillRect(0, 0, w, h);
 		} else if (item.order.getStatus() == TaskRequestStatus.IN_PROGRESS) {
@@ -49,9 +49,7 @@ public class ShelfStatus {
 	}
 	
 	public void draw(Graphics g, int w, int h) {
-//		g.setColor(Color.LIGHT_GRAY);
-//		g.fillRect(0, 0, w, h);
-		
+		g.fillRect(0, h - 10, w, h);
 		drawItems(g, w, h);
 	}
 }

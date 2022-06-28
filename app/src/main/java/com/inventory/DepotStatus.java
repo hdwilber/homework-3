@@ -1,5 +1,6 @@
 package com.inventory;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -15,6 +16,7 @@ public class DepotStatus extends JPanel implements DepotEventListener {
 	public DepotStatus(Depot d) {
 		super();
 		depot = d;
+		setBackground(Color.WHITE);
 		setupShelves();
 		setMinimumSize(new Dimension(500, 500));
 		setPreferredSize(new Dimension(1000, 1000));
@@ -34,9 +36,9 @@ public class DepotStatus extends JPanel implements DepotEventListener {
 		int width = getWidth();
 		int height = getHeight();
 		int padding = 20;
-		int y = (int)Math.round(height  * 0.40);
+		int y = (int)Math.round(height  * 0.20);
 		int shelfHeight = Math.round((height - y) / shelves.length) - padding;
-		int x = (int) Math.round(width * 0.1);
+		int x = (int) Math.round(width * 0.05);
 		int shelfWidth = width - (x * 2);
 		for(int i = 0; i < shelves.length; i++) {
 			Graphics subG = g.create(x, y, shelfWidth+1, shelfHeight+1);
@@ -48,7 +50,7 @@ public class DepotStatus extends JPanel implements DepotEventListener {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
+		g.drawImage(image, 16, 16, getWidth() -32, getHeight() -32, this);
 		drawShelves(g);
 	}
 

@@ -1,5 +1,6 @@
 package com.inventory;
 
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -10,8 +11,11 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
+import com.inventory.product.Product;
 import com.inventory.taskrequest.InventoryRequest;
 import com.inventory.taskrequest.InventoryStockTransfer;
 
@@ -90,8 +94,8 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 		JTabbedPane tabbedPane = new JTabbedPane();
 		JPanel dashboard = new JPanel();
 		JPanel products = new JPanel();
-		status.setBorder(new EmptyBorder(12, 12, 12, 12));
-		depotStatus.setBorder(new EmptyBorder(12, 12, 12, 12));
+		status.setBorder(new CompoundBorder(new LineBorder(Color.LIGHT_GRAY, 2), new EmptyBorder(12, 12, 12, 12)));
+		depotStatus.setBorder(new CompoundBorder(new LineBorder(Color.LIGHT_GRAY, 2), new EmptyBorder(12, 12, 12, 12)));
 		tabbedPane.addTab("Dashboard", dashboard);
 		tabbedPane.addTab("Productos", productsTable);
 		tabbedPane.addTab("Estadisticas", new JPanel());

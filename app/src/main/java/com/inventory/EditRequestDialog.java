@@ -13,6 +13,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.NumberFormatter;
 
+import com.inventory.product.Product;
 import com.inventory.taskrequest.InventoryRequest;
 import com.inventory.taskrequest.TaskRequestPriority;
 import com.inventory.utils.JListEnum;

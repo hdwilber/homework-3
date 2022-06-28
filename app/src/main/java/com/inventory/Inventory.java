@@ -7,6 +7,8 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import javax.swing.event.EventListenerList;
 
+import com.inventory.product.Product;
+import com.inventory.product.ProductType;
 import com.inventory.taskrequest.*;
 
 interface InventoryEventListener extends EventListener {

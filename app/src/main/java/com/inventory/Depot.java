@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.swing.event.EventListenerList;
 
+import com.inventory.product.Product;
 import com.inventory.taskrequest.InventoryInbound;
 import com.inventory.taskrequest.InventoryOutbound;
 import com.inventory.taskrequest.InventoryStockTransfer;

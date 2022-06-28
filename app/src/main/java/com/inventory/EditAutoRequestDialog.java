@@ -3,6 +3,8 @@ package com.inventory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import com.inventory.product.Product;
+
 class AutomaticRequest {
 	Product product;
 	Provider provider;

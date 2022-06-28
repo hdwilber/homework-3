@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.List;
 
+import com.inventory.product.Product;
 import com.inventory.taskrequest.InventoryInbound;
 import com.inventory.taskrequest.InventoryRequest;
 import com.inventory.taskrequest.TaskRequest;

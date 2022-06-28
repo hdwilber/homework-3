@@ -1,6 +1,16 @@
 package com.inventory.taskrequest;
 
-import com.inventory.Product;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import com.inventory.product.Product;
 
 public class InventoryRequest extends TaskRequest {
 	Product product;
@@ -15,16 +25,21 @@ public class InventoryRequest extends TaskRequest {
 		amount = a;
 	}
 
-	@Override
-	public String getLabel() {
-		return product.getName() + "[" +priority + "](" + amount + ")";
-	}
-	
 	public Product getProduct() {
 		return product;
 	}
-	
-	public int getAmount() {
-		return amount;
+	@Override
+	public void setContentInfo(JPanel panel, ImageIcon icon, Font font) {
+		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+		JLabel label = new JLabel(icon);
+		label.setOpaque(false);
+		label.setFont(font);
+		label.setText(getProduct().getName() + "(" + amount +")");
+		label.setHorizontalTextPosition(JLabel.CENTER);
+		label.setVerticalTextPosition(JLabel.TOP);
+		label.setForeground(Color.white);
+		panel.setBackground(getPriority().getColor());
+		panel.add(label);
 	}
+	
 }

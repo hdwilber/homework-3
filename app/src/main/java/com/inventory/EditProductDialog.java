@@ -11,6 +11,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import com.inventory.product.Product;
+import com.inventory.product.ProductType;
 import com.inventory.utils.JListEnum;
 import com.inventory.utils.JListFromList;
 
