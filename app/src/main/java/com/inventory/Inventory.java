@@ -2,6 +2,7 @@ package com.inventory;
 
 import java.util.ArrayList;
 import java.util.EventListener;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -19,35 +20,36 @@ interface StoreStatusListener extends EventListener {
 }
 
 public class Inventory {
-	Depot depot;
+	List<Depot> depots;
 	List<Provider> providers;
 	Store store;
 
 	EventListenerList listenerList = new EventListenerList();
 	EventListenerList storeListenerList = new EventListenerList();
 
-	public TaskRequestProcessor requestsProcessor = new TaskRequestProcessor(4, 1) {
+	public TaskRequestProcessor requestsProcessor = new TaskRequestProcessor(1, 1) {
 		public long getProcessingTime(TaskRequest io) {
 			InventoryRequest ir = (InventoryRequest)io;
-//			long time = ((long)(Math.random() * 1000)) * ir.getAmount();
-			long time = 300;
+			long time = ((long)(Math.random() * 1000)) * ir.getAmount();
+//			long time = 200;
 			return time;
 		}
 		@Override
 		public void onTaskRequestComplete(TaskRequest r) {
-			depot.receiveInventoryInbound((InventoryInbound)r);
+			receiveInventoryInbound((InventoryInbound)r);
 		}
 	};
 
-	public TaskRequestProcessor outboundsProcessor = new TaskRequestProcessor(4, 1) {
+	public TaskRequestProcessor outboundsProcessor = new TaskRequestProcessor(1, 1) {
 		public long getProcessingTime(TaskRequest io) {
 			InventoryStockTransfer ir = (InventoryStockTransfer)io;
 			long time = ((long)(Math.random() * 1000)) * ir.getAmount();
+//			long time = 200;
 			return time;
 		}
 		@Override
 		public void onTaskRequestComplete(TaskRequest r) {
-			List<InventoryOutbound> res = depot.receiveStockTransfer((InventoryStockTransfer)r);
+			List<InventoryOutbound> res = receiveStockTransfer((InventoryStockTransfer)r);
 			if (res != null) {
 				res.forEach(order -> {
 					sendTask(store, order);
@@ -58,10 +60,13 @@ public class Inventory {
 
 	public Inventory() {
 		super();
-		depot = new Depot(10, 10, 4);
+		depots = new ArrayList<Depot>();
+		depots.add(new Depot(10, 10, 5));
+		depots.add(new Depot(20, 10, 5));
+		depots.add(new Depot(15, 10, 5));
 		store = new Store(this, 3, 3);
 		providers = new ArrayList<Provider>();
-		Provider provider  = new Provider(this, "Proveedor Jefe", 3, 1);
+		Provider provider  = new Provider(this, "Proveedor Jefe", 4, 1);
 		provider.addProduct(new Product("Producto 1", ProductType.DEHYDRATED));
 		provider.addProduct(new Product("Producto 2", ProductType.CLEANING));
 		provider.addProduct(new Product("Producto 3", ProductType.FRESH));
@@ -91,6 +96,59 @@ public class Inventory {
 		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 5, TaskRequestPriority.ALL_MIGHTY));
 		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.LOW));
 		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.HIGH));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 5, TaskRequestPriority.HIGH));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 3, TaskRequestPriority.VERY_HIGH));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.ALL_MIGHTY));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 1, TaskRequestPriority.LOW));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.HIGH));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 4, TaskRequestPriority.VERY_HIGH));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 5, TaskRequestPriority.ALL_MIGHTY));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.LOW));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.HIGH));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 4, TaskRequestPriority.VERY_HIGH));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 5, TaskRequestPriority.ALL_MIGHTY));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.LOW));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.HIGH));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 5, TaskRequestPriority.HIGH));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 3, TaskRequestPriority.VERY_HIGH));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.ALL_MIGHTY));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 1, TaskRequestPriority.LOW));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.HIGH));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 4, TaskRequestPriority.VERY_HIGH));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 5, TaskRequestPriority.ALL_MIGHTY));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.LOW));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 4, TaskRequestPriority.VERY_HIGH));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 5, TaskRequestPriority.ALL_MIGHTY));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.LOW));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.HIGH));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 5, TaskRequestPriority.HIGH));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 3, TaskRequestPriority.VERY_HIGH));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.ALL_MIGHTY));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 1, TaskRequestPriority.LOW));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.HIGH));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.HIGH));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 5, TaskRequestPriority.HIGH));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 3, TaskRequestPriority.VERY_HIGH));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.ALL_MIGHTY));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 1, TaskRequestPriority.LOW));
+		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.HIGH));
+	}
+
+	protected List<InventoryOutbound> receiveStockTransfer(InventoryStockTransfer r) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	protected void receiveInventoryInbound(InventoryInbound r) {
+		Iterator<Depot> iter = depots.iterator();
+		while(iter.hasNext()) {
+			Depot depot = iter.next();
+			if (depot.canReceiveInbound(r)) {
+				requestsProcessor.sendTask(depot, r);
+				break;
+			} else {
+			}
+		}
 	}
 
 	public void addInventoryEventListener(InventoryEventListener l) {
@@ -150,5 +208,16 @@ public class Inventory {
 
 	public void addStockTransfer(InventoryStockTransfer data) {
 		store.sendTask(outboundsProcessor, data);
+	}
+
+	public List<InventoryItem> getCurrentStockByProduct(Product p) {
+		List<InventoryItem> entries = new ArrayList<InventoryItem>();
+		Iterator<Depot> iter = depots.iterator();
+		while(iter.hasNext()) {
+			Depot depot = iter.next();
+			List<InventoryItem> existent = depot.getCurrentStockByProduct(p);
+			entries.addAll(existent);
+		}
+		return entries;
 	}
 }

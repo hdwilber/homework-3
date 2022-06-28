@@ -137,7 +137,7 @@ class StockProductDetails extends JPanel {
 	public void setProduct(Product p) {
 		if (p != null && product != p) {
 			product = p;
-			List<InventoryItem> items = inventory.depot.getCurrentStockByProduct(p);
+			List<InventoryItem> items = inventory.getCurrentStockByProduct(p);
 			Iterator<InventoryItem> iter = items.iterator();
 			int count = 0;
 			while(iter.hasNext()) {

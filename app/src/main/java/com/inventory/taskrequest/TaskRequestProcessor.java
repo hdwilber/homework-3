@@ -48,7 +48,7 @@ class TaskRequestExecution implements Runnable, Comparable<TaskRequestExecution>
 					current.interrupt();
 				}
 			}
-		}, 4000);
+		}, 1000);
 	}
 	@Override  
 	public void run() {  
@@ -62,7 +62,7 @@ class TaskRequestExecution implements Runnable, Comparable<TaskRequestExecution>
 						current.interrupt();
 					}
 				}
-			}, 4000);
+			}, 1000);
 		}
 		while(!Thread.currentThread().isInterrupted()){  
 			if(!suspended){  

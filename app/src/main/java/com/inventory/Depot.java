@@ -10,6 +10,8 @@ import com.inventory.product.Product;
 import com.inventory.taskrequest.InventoryInbound;
 import com.inventory.taskrequest.InventoryOutbound;
 import com.inventory.taskrequest.InventoryStockTransfer;
+import com.inventory.taskrequest.TaskRequest;
+import com.inventory.taskrequest.TaskRequestProcessor;
 import com.inventory.taskrequest.TaskRequestStatus;
 
 interface DepotEventListener extends EventListener {
@@ -17,15 +19,24 @@ interface DepotEventListener extends EventListener {
 	public void onDepotItemStoreComplete();
 }
 
-public class Depot {
+public class Depot extends TaskRequestProcessor {
 	Shelf[] shelves;
 	double width, height;
     EventListenerList listenerList = new EventListenerList();
+    volatile int currentTotal;
 
 	public Depot(double w, double h, int count) {
+		super(1, 1);
 		width = w;
 		height = h;
 		setupShelves(count);
+	}
+
+	@Override
+	public boolean receiveTask(TaskRequest ts) {
+		InventoryInbound i = (InventoryInbound)ts;
+		currentTotal += i.amount;
+		return super.receiveTask(ts);
 	}
 
     public void addDepotEventListener(DepotEventListener l) {
@@ -110,6 +121,14 @@ public class Depot {
 		return left <= 0;
 	}
 	
+	public boolean canReceiveInbound(InventoryInbound in) {
+		int count = 0;
+		for(int i = 0; i < shelves.length; i++) {
+			count += shelves[i].getAvailableSpace();
+		}
+		return (in.amount - (count - currentTotal)) <= 0;
+	}
+	
 	public List<InventoryOutbound> transfer(InventoryStockTransfer st) {
 		List<InventoryOutbound> result = new ArrayList<InventoryOutbound>();
 		int left = st.getAmount();
@@ -127,13 +146,19 @@ public class Depot {
 		fireItemStoreComplete();
 		return result;
 	}
-	
-	public boolean receiveInventoryInbound(InventoryInbound i) {
-		i.setStatus(TaskRequestStatus.IN_PROGRESS);
+
+	@Override
+	public void onTaskRequestComplete(TaskRequest r) {
+		InventoryInbound i = (InventoryInbound)r;
+		currentTotal -= i.amount;
 		store(i);
 		i.setStatus(TaskRequestStatus.COMPLETE);
-		return true;
 	}
+	
+//	public boolean receiveInventoryInbound(InventoryInbound i) {
+//		i.setStatus(TaskRequestStatus.IN_PROGRESS);
+//		return true;
+//	}
 
 	public List<InventoryOutbound> receiveStockTransfer(InventoryStockTransfer st) {
 		boolean succeed = canMeetStockTransfer(st);
