@@ -49,11 +49,10 @@ public class Inventory {
 		}
 		@Override
 		public void onTaskRequestComplete(TaskRequest r) {
-			List<InventoryOutbound> res = receiveStockTransfer((InventoryStockTransfer)r);
-			if (res != null) {
-				res.forEach(order -> {
-					sendTask(store, order);
-				});
+			if (r instanceof InventoryStockTransfer) {
+				receiveStockTransfer((InventoryStockTransfer)r);
+			} else if (r instanceof InventoryOutbound){
+				sendTask(store, r);
 			}
 		}
 	};
@@ -61,15 +60,15 @@ public class Inventory {
 	public Inventory() {
 		super();
 		depots = new ArrayList<Depot>();
-		depots.add(new Depot(10, 10, 5));
-		depots.add(new Depot(20, 10, 5));
-		depots.add(new Depot(15, 10, 5));
+		depots.add(new Depot(this, 10, 10, 5));
+		depots.add(new Depot(this, 20, 10, 5));
+		depots.add(new Depot(this, 15, 10, 5));
 		store = new Store(this, 3, 3);
 		providers = new ArrayList<Provider>();
 		Provider provider  = new Provider(this, "Proveedor Jefe", 4, 1);
-		provider.addProduct(new Product("Producto 1", ProductType.DEHYDRATED));
-		provider.addProduct(new Product("Producto 2", ProductType.CLEANING));
-		provider.addProduct(new Product("Producto 3", ProductType.FRESH));
+		provider.addProduct(new Product("P 1", ProductType.DEHYDRATED));
+		provider.addProduct(new Product("P 2", ProductType.CLEANING));
+		provider.addProduct(new Product("P 3", ProductType.FRESH));
 		providers.add(provider);
 
 		//		Product p = provider.products.get(1);
@@ -134,9 +133,16 @@ public class Inventory {
 		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.HIGH));
 	}
 
-	protected List<InventoryOutbound> receiveStockTransfer(InventoryStockTransfer r) {
-		// TODO Auto-generated method stub
-		return null;
+	protected void receiveStockTransfer(InventoryStockTransfer r) {
+		Iterator<Depot> iter = depots.iterator();
+		while(iter.hasNext()) {
+			Depot depot = iter.next();
+			if (depot.canMeetStockTransfer(r)) {
+				outboundsProcessor.sendTask(depot, r);
+				break;
+			} else {
+			}
+		}
 	}
 
 	protected void receiveInventoryInbound(InventoryInbound r) {

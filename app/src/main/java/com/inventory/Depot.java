@@ -22,21 +22,28 @@ interface DepotEventListener extends EventListener {
 public class Depot extends TaskRequestProcessor {
 	Shelf[] shelves;
 	double width, height;
+	Inventory inventory;
     EventListenerList listenerList = new EventListenerList();
     volatile int currentTotal;
 
-	public Depot(double w, double h, int count) {
+	public Depot(Inventory i, double w, double h, int count) {
 		super(1, 1);
 		width = w;
 		height = h;
 		setupShelves(count);
+		inventory = i;
 	}
 
 	@Override
 	public boolean receiveTask(TaskRequest ts) {
-		InventoryInbound i = (InventoryInbound)ts;
-		currentTotal += i.amount;
-		return super.receiveTask(ts);
+		if (ts instanceof InventoryInbound) {
+			InventoryInbound i = (InventoryInbound)ts;
+			currentTotal += i.amount;
+			return super.receiveTask(ts);
+		} else if (ts instanceof InventoryStockTransfer) {
+			return super.receiveTask(ts);
+		}
+		return false;
 	}
 
     public void addDepotEventListener(DepotEventListener l) {
@@ -149,10 +156,23 @@ public class Depot extends TaskRequestProcessor {
 
 	@Override
 	public void onTaskRequestComplete(TaskRequest r) {
-		InventoryInbound i = (InventoryInbound)r;
-		currentTotal -= i.amount;
-		store(i);
-		i.setStatus(TaskRequestStatus.COMPLETE);
+		if (r instanceof InventoryInbound) {
+			InventoryInbound i = (InventoryInbound)r;
+			currentTotal -= i.amount;
+			store(i);
+			i.setStatus(TaskRequestStatus.COMPLETE);
+		} else if (r instanceof InventoryStockTransfer) {
+
+			List<InventoryOutbound> list = transfer((InventoryStockTransfer)r);
+			list.forEach(outbound -> {
+				sendTask(inventory.outboundsProcessor, outbound);
+			});
+
+//			InventoryInbound i = (InventoryInbound)r;
+//			currentTotal -= i.amount;
+//			store(i);
+//			i.setStatus(TaskRequestStatus.COMPLETE);
+		}
 	}
 	
 //	public boolean receiveInventoryInbound(InventoryInbound i) {
