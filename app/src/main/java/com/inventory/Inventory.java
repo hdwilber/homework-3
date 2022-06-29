@@ -14,6 +14,7 @@ import com.inventory.taskrequest.*;
 
 interface InventoryEventListener extends EventListener {
 	public void onTransferRequestUpdate();
+	public void onProductSelected(Product p);
 }
 interface StoreStatusListener extends EventListener {
 	public void onStoreStatusUpdate();
@@ -23,6 +24,7 @@ public class Inventory {
 	List<Depot> depots;
 	List<Provider> providers;
 	Store store;
+	Product selectedProduct;
 
 	EventListenerList listenerList = new EventListenerList();
 	EventListenerList storeListenerList = new EventListenerList();
@@ -173,6 +175,15 @@ public class Inventory {
 		storeListenerList.remove(StoreStatusListener.class, l);
 	}
 
+	public void fireOnProductSelected(Product p) {
+		Object[] listeners = listenerList.getListenerList();
+		for (int i = listeners.length-2; i >= 0; i-=2) {
+			if (listeners[i] == InventoryEventListener.class) {
+				((InventoryEventListener)listeners[i+1]).onProductSelected(p);
+			}
+		}
+		
+	}
 	public void fireStoreStatusUpdate() {
 		Object[] listeners = storeListenerList.getListenerList();
 		for (int i = listeners.length-2; i >= 0; i-=2) {
@@ -225,5 +236,16 @@ public class Inventory {
 			entries.addAll(existent);
 		}
 		return entries;
+	}
+	
+	public boolean toogleActiveProduct(Product p) {
+		if (p == selectedProduct) {
+			fireOnProductSelected(null);
+			selectedProduct = null;
+			return false;
+		}
+		selectedProduct = p;
+		fireOnProductSelected(p);
+		return true;
 	}
 }

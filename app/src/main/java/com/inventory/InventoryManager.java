@@ -120,17 +120,21 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 		dashboard.add(status);
 		dashboard.add(Box.createVerticalStrut(8));
 
+
+		dashboard.add(Box.createVerticalStrut(8));
+		
+		JPanel root = new JPanel();
+		root.setLayout(new BoxLayout(root, BoxLayout.Y_AXIS));
+		root.add(tabbedPane);
+
 		JPanel depotsPanel = new JPanel();
 		JScrollPane depots = new JScrollPane(depotsPanel);
 		depotStatusList.forEach(dst -> {
 			depotsPanel.add(dst);
 		});
+		root.add(depots);
 
-		dashboard.add(depots);
-		dashboard.add(Box.createVerticalStrut(8));
-		
-		getContentPane().add(tabbedPane);
-		
+		getContentPane().add(root);
 		pack();
 		setVisible(true);
 	}

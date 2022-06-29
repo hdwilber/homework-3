@@ -41,6 +41,7 @@ class TaskRequestExecution implements Runnable, Comparable<TaskRequestExecution>
 			request.notifyAll();
 		}
 		timer = new Timer();
+		try { 
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -49,6 +50,9 @@ class TaskRequestExecution implements Runnable, Comparable<TaskRequestExecution>
 				}
 			}
 		}, 250);
+		} catch(Exception e) {
+			System.out.println("EEE : " + e.getMessage());
+		}
 	}
 	@Override  
 	public void run() {  

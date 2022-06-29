@@ -160,6 +160,10 @@ public class ProductListTable extends JPanel implements ActionListener {
 	private final String ACTION_DISPLAY_STOCK = "DISPLAY_STOCK";
 	private final String ACTION_REQUEST = "ACTION_REQUEST";
 	private final String ACTION_DELETE = "ACTION_DELETE";
+	JButton displayStockButton = new JButton("Ver Stock");
+	JButton deleteButton = new JButton("Borrar");
+	JButton requestButton = new JButton("Pedir");
+
 
 	public ProductListTable(Inventory i, InventoryManager m, List<Provider> providers) {
 		super();
@@ -196,10 +200,6 @@ public class ProductListTable extends JPanel implements ActionListener {
 
 	public JPanel getControllers() {
 		JPanel p = new JPanel();
-		JButton displayStockButton = new JButton("Ver Stock");
-		JButton deleteButton = new JButton("Borrar");
-		JButton requestButton = new JButton("Pedir");
-		
 		displayStockButton.setActionCommand(ACTION_DISPLAY_STOCK);
 		displayStockButton.addActionListener(this);
 		requestButton.setActionCommand(ACTION_REQUEST);
@@ -219,6 +219,10 @@ public class ProductListTable extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent event) {
 		if (event.getActionCommand() == ACTION_DISPLAY_STOCK) {
 			System.out.println("DISPLAY STOCK: " + table.getSelectedRow());
+			Product product = model.getRowAt(table.getSelectedRow());
+			boolean isSet = inventory.toogleActiveProduct(product);
+			displayStockButton.setText(isSet ? "Ver Todo" : "Ver Stock");
+
 		} else if(event.getActionCommand() == ACTION_REQUEST) {
 			Product product = model.getRowAt(table.getSelectedRow());
 			manager.showEditRequestDialog(product);

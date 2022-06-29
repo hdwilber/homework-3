@@ -8,11 +8,14 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
-public class DepotStatus extends JPanel implements DepotEventListener {
+import com.inventory.product.Product;
+
+public class DepotStatus extends JPanel implements DepotEventListener, InventoryEventListener {
 	private static final long serialVersionUID = 1L;
 	Image image = new ImageIcon(getClass().getResource("/images/depot.png")).getImage();
 	Depot depot;
 	ShelfStatus[] shelves;
+	Product selectedProduct;
 	public DepotStatus(Depot d) {
 		super();
 		depot = d;
@@ -21,6 +24,7 @@ public class DepotStatus extends JPanel implements DepotEventListener {
 		setMinimumSize(new Dimension(500, 500));
 		setPreferredSize(new Dimension(1000, 1000));
 		d.addDepotEventListener(this);
+		d.inventory.addInventoryEventListener(this);
 	}
 
 	public void setupShelves() {
@@ -43,7 +47,7 @@ public class DepotStatus extends JPanel implements DepotEventListener {
 		for(int i = 0; i < shelves.length; i++) {
 			Graphics subG = g.create(x, y, shelfWidth+1, shelfHeight+1);
 			y += shelfHeight + padding;
-			shelves[i].draw(subG, shelfWidth, shelfHeight);
+			shelves[i].draw(subG, shelfWidth, shelfHeight, selectedProduct);
 		}
 	}
 	
@@ -61,6 +65,18 @@ public class DepotStatus extends JPanel implements DepotEventListener {
 	@Override
 	public void onDepotItemStoreComplete() {
 //		System.out.println("STORED");
+		this.repaint();
+	}
+
+	@Override
+	public void onTransferRequestUpdate() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onProductSelected(Product p) {
+		selectedProduct = p;
 		this.repaint();
 	}
 
