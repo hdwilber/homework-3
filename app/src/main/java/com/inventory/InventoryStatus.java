@@ -74,8 +74,8 @@ class PathStatusModel extends AbstractListModel<TaskRequest> {
 		TaskRequest[] aux = list.toArray(TaskRequest[]::new);
 		Arrays.sort(aux);
 		if (aux.length > 0) {
-			if (aux.length >= 5) {
-				arrayList = Arrays.copyOfRange(aux, 0, 5);
+			if (aux.length >= 15) {
+				arrayList = Arrays.copyOfRange(aux, 0, 15);
 			} else {
 				arrayList = aux;
 			}
