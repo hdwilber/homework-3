@@ -160,9 +160,11 @@ public class ProductListTable extends JPanel implements ActionListener {
 	private final String ACTION_DISPLAY_STOCK = "DISPLAY_STOCK";
 	private final String ACTION_REQUEST = "ACTION_REQUEST";
 	private final String ACTION_DELETE = "ACTION_DELETE";
+	private final String ACTION_AUTO_REQUEST = "ACTION_AUTO_REQUEST";
 	JButton displayStockButton = new JButton("Ver Stock");
 	JButton deleteButton = new JButton("Borrar");
 	JButton requestButton = new JButton("Pedir");
+	JButton autoRequestButton = new JButton("Agregar Pedido Automatico");
 
 
 	public ProductListTable(Inventory i, InventoryManager m, List<Provider> providers) {
@@ -204,11 +206,17 @@ public class ProductListTable extends JPanel implements ActionListener {
 		displayStockButton.addActionListener(this);
 		requestButton.setActionCommand(ACTION_REQUEST);
 		requestButton.addActionListener(this);
+		autoRequestButton.setActionCommand(ACTION_AUTO_REQUEST);
+		autoRequestButton.addActionListener(this);
 
 		p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
 		p.add(displayStockButton);
 		p.add(Box.createHorizontalStrut(8));
+		p.add(displayStockButton);
+		p.add(Box.createHorizontalStrut(8));
 		p.add(requestButton);
+		p.add(Box.createHorizontalStrut(8));
+		p.add(autoRequestButton);
 		p.add(Box.createHorizontalStrut(8));
 		p.add(deleteButton);
 		p.add(Box.createHorizontalGlue());
@@ -228,6 +236,9 @@ public class ProductListTable extends JPanel implements ActionListener {
 			manager.showEditRequestDialog(product);
 		} else if(event.getActionCommand() == ACTION_DELETE) {
 			System.out.println("DELETE: " + table.getSelectedRow());
+		} else if(event.getActionCommand() == ACTION_AUTO_REQUEST) {
+			Product product = model.getRowAt(table.getSelectedRow());
+			manager.showAutoRequestDialog(product);
 		}
 	}
 }

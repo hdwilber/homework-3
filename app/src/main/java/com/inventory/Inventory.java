@@ -25,6 +25,11 @@ public class Inventory {
 	List<Provider> providers;
 	Store store;
 	Product selectedProduct;
+	List<AutomaticRequest> automaticRequests;
+	int totalRequests = 0;
+	int totalInbounds = 0;
+	int totalTransfers = 0;
+	int totalOutbounds = 0;
 
 	EventListenerList listenerList = new EventListenerList();
 	EventListenerList storeListenerList = new EventListenerList();
@@ -38,7 +43,16 @@ public class Inventory {
 		}
 		@Override
 		public void onTaskRequestComplete(TaskRequest r) {
-			receiveInventoryInbound((InventoryInbound)r);
+			if (r instanceof InventoryRequest) { 
+				totalRequests++;
+				InventoryRequest request = (InventoryRequest)r;
+				Provider provider = providers.get(0);
+				provider.receiveTask(request);
+
+			} else if (r instanceof InventoryInbound) {
+				totalInbounds++;
+				receiveInventoryInbound((InventoryInbound)r);
+			}
 		}
 	};
 
@@ -52,8 +66,10 @@ public class Inventory {
 		@Override
 		public void onTaskRequestComplete(TaskRequest r) {
 			if (r instanceof InventoryStockTransfer) {
+				totalTransfers++;
 				receiveStockTransfer((InventoryStockTransfer)r);
 			} else if (r instanceof InventoryOutbound){
+				totalOutbounds++;
 				sendTask(store, r);
 			}
 		}
@@ -66,6 +82,7 @@ public class Inventory {
 		depots.add(new Depot(this, 20, 10, 5));
 		depots.add(new Depot(this, 15, 10, 5));
 		store = new Store(this, 3, 3);
+		automaticRequests = new ArrayList<AutomaticRequest>();
 		providers = new ArrayList<Provider>();
 		Provider provider  = new Provider(this, "Proveedor Jefe", 4, 1);
 		provider.addProduct(new Product("P 1", ProductType.DEHYDRATED));
@@ -81,58 +98,58 @@ public class Inventory {
 		//		requestsProcessor.sendTask(provider, new InventoryRequest(p, 3));
 		//		requestsProcessor.sendTask(provider, new InventoryRequest(p, 1));
 		//		requestsProcessor.sendTask(provider, new InventoryRequest(p, 3, TaskRequestPriority.MIDDLE));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(0), 2, TaskRequestPriority.LOW));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 1, TaskRequestPriority.MIDDLE));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.VERY_HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 1, TaskRequestPriority.VERY_HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.ALL_MIGHTY));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.LOW));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 4, TaskRequestPriority.HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 3, TaskRequestPriority.VERY_HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.ALL_MIGHTY));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 1, TaskRequestPriority.LOW));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 4, TaskRequestPriority.VERY_HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 5, TaskRequestPriority.ALL_MIGHTY));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.LOW));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 5, TaskRequestPriority.HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 3, TaskRequestPriority.VERY_HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.ALL_MIGHTY));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 1, TaskRequestPriority.LOW));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 4, TaskRequestPriority.VERY_HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 5, TaskRequestPriority.ALL_MIGHTY));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.LOW));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 4, TaskRequestPriority.VERY_HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 5, TaskRequestPriority.ALL_MIGHTY));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.LOW));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 5, TaskRequestPriority.HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 3, TaskRequestPriority.VERY_HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.ALL_MIGHTY));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 1, TaskRequestPriority.LOW));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 4, TaskRequestPriority.VERY_HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 5, TaskRequestPriority.ALL_MIGHTY));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.LOW));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 4, TaskRequestPriority.VERY_HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 5, TaskRequestPriority.ALL_MIGHTY));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.LOW));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 5, TaskRequestPriority.HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 3, TaskRequestPriority.VERY_HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.ALL_MIGHTY));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 1, TaskRequestPriority.LOW));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 5, TaskRequestPriority.HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 3, TaskRequestPriority.VERY_HIGH));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.ALL_MIGHTY));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(1), 1, TaskRequestPriority.LOW));
-		requestsProcessor.sendTask(provider, new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(0), 2, TaskRequestPriority.LOW));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 1, TaskRequestPriority.MIDDLE));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.VERY_HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 1, TaskRequestPriority.VERY_HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.ALL_MIGHTY));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.LOW));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 4, TaskRequestPriority.HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 3, TaskRequestPriority.VERY_HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.ALL_MIGHTY));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 1, TaskRequestPriority.LOW));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 4, TaskRequestPriority.VERY_HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(2), 5, TaskRequestPriority.ALL_MIGHTY));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.LOW));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 5, TaskRequestPriority.HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 3, TaskRequestPriority.VERY_HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.ALL_MIGHTY));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 1, TaskRequestPriority.LOW));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 4, TaskRequestPriority.VERY_HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(2), 5, TaskRequestPriority.ALL_MIGHTY));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.LOW));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 4, TaskRequestPriority.VERY_HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(2), 5, TaskRequestPriority.ALL_MIGHTY));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.LOW));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 5, TaskRequestPriority.HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 3, TaskRequestPriority.VERY_HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.ALL_MIGHTY));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 1, TaskRequestPriority.LOW));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 4, TaskRequestPriority.VERY_HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(2), 5, TaskRequestPriority.ALL_MIGHTY));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.LOW));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 4, TaskRequestPriority.VERY_HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(2), 5, TaskRequestPriority.ALL_MIGHTY));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.LOW));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 5, TaskRequestPriority.HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 3, TaskRequestPriority.VERY_HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.ALL_MIGHTY));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 1, TaskRequestPriority.LOW));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 2, TaskRequestPriority.HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 5, TaskRequestPriority.HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 3, TaskRequestPriority.VERY_HIGH));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.ALL_MIGHTY));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(1), 1, TaskRequestPriority.LOW));
+		requestsProcessor.receiveTask(new InventoryRequest(provider.products.get(2), 2, TaskRequestPriority.HIGH));
 	}
 
 	protected void receiveStockTransfer(InventoryStockTransfer r) {
@@ -225,6 +242,10 @@ public class Inventory {
 
 	public void addStockTransfer(InventoryStockTransfer data) {
 		store.sendTask(outboundsProcessor, data);
+	}
+	
+	public void addAutomaticRequest(AutomaticRequest ar) {
+		automaticRequests.add(ar);
 	}
 
 	public List<InventoryItem> getCurrentStockByProduct(Product p) {

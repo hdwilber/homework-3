@@ -18,6 +18,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 
 import com.inventory.product.Product;
 import com.inventory.taskrequest.InventoryRequest;
@@ -29,6 +30,7 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 	EditRequestDialog<T> editRequestDialog;
 	EditProviderDialog<T> editProviderDialog;
 	EditStockTransferDialog<T> editStockTransferDialog;
+	EditAutoRequestDialog<T> editAutoRequestDialog;
 	ProductListTable productsTable;
 	Inventory inventory;
 	InventoryStatus status;
@@ -44,6 +46,7 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 		editRequestDialog = new EditRequestDialog<T>(this, this);
 		editProviderDialog = new EditProviderDialog<T>(this, this);
 		editStockTransferDialog = new EditStockTransferDialog<T>(this, this);
+		editAutoRequestDialog = new EditAutoRequestDialog<T>(this, this);
 
 		inventory = new Inventory();
 		status = new InventoryStatus(inventory);
@@ -104,10 +107,11 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 		JTabbedPane tabbedPane = new JTabbedPane();
 		JPanel dashboard = new JPanel();
 		JPanel products = new JPanel();
-		status.setBorder(new CompoundBorder(new LineBorder(Color.LIGHT_GRAY, 2), new EmptyBorder(12, 12, 12, 12)));
+//		status.setBorder(new CompoundBorder(new LineBorder(Color.LIGHT_GRAY, 2), new EmptyBorder(12, 12, 12, 12)));
+
 		tabbedPane.addTab("Dashboard", dashboard);
 		tabbedPane.addTab("Productos", productsTable);
-		tabbedPane.addTab("Estadisticas", new JPanel());
+		tabbedPane.addTab("Estadisticas", new Stats(inventory));
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 		tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
 		tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
@@ -129,6 +133,7 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 
 		JPanel depotsPanel = new JPanel();
 		JScrollPane depots = new JScrollPane(depotsPanel);
+		depots.setBorder(new TitledBorder(LineBorder.createGrayLineBorder(), "Almacenes"));
 		depotStatusList.forEach(dst -> {
 			depotsPanel.add(dst);
 		});
@@ -147,13 +152,15 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 	@Override
 	public void onEditDialogComplete(EditDialog dialog, T original, T data) {
 		if (data instanceof Product) {
-//			((EditProductDialog)dialog).addToProvider();
+			((EditProductDialog)dialog).addToProvider();
 		} else if (data instanceof InventoryRequest) {
 			inventory.addRequest((InventoryRequest)original, (InventoryRequest)data);
 		} else if (data instanceof Provider) {
 			inventory.addProvider((Provider)original, (Provider)data);
 		} else if (data instanceof InventoryStockTransfer) {
 			inventory.addStockTransfer((InventoryStockTransfer)data);
+		} else if (data instanceof AutomaticRequest) {
+			inventory.addAutomaticRequest((AutomaticRequest)data);
 		}
 		dialog.setVisible(false);
 		
@@ -161,5 +168,10 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 	@Override
 	public void onEditDialogCancel(EditDialog dialog, T original) {
 		dialog.setVisible(false);
+	}
+
+	public void showAutoRequestDialog(Product p) {
+		editAutoRequestDialog.setData(inventory.providers, p);
+		editAutoRequestDialog.setVisible(true);
 	}
 }
