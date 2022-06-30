@@ -159,8 +159,8 @@ public class InventoryManager<T> extends JFrame implements EditDialogListener<T>
 			inventory.addProvider((Provider)original, (Provider)data);
 		} else if (data instanceof InventoryStockTransfer) {
 			inventory.addStockTransfer((InventoryStockTransfer)data);
-		} else if (data instanceof AutomaticRequest) {
-			inventory.addAutomaticRequest((AutomaticRequest)data);
+		} else if (data instanceof AutomaticProductRequest) {
+			inventory.addAutomaticRequest((AutomaticProductRequest)data);
 		}
 		dialog.setVisible(false);
 		

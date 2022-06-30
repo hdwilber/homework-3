@@ -25,7 +25,7 @@ public class Inventory {
 	List<Provider> providers;
 	Store store;
 	Product selectedProduct;
-	List<AutomaticRequest> automaticRequests;
+	List<AutomaticProductRequest> automaticRequests;
 	int totalRequests = 0;
 	int totalInbounds = 0;
 	int totalTransfers = 0;
@@ -71,6 +71,11 @@ public class Inventory {
 			} else if (r instanceof InventoryOutbound){
 				totalOutbounds++;
 				sendTask(store, r);
+
+				AutomaticProductRequest apr = checkForProductRequest(((InventoryOutbound)r).request.getProduct());
+				if (apr != null) {
+					sendTask(requestsProcessor, new InventoryRequest(apr.product, apr.amount, apr.priority));
+				}
 			}
 		}
 	};
@@ -82,7 +87,7 @@ public class Inventory {
 		depots.add(new Depot(this, 20, 10, 5));
 		depots.add(new Depot(this, 15, 10, 5));
 		store = new Store(this, 3, 3);
-		automaticRequests = new ArrayList<AutomaticRequest>();
+		automaticRequests = new ArrayList<AutomaticProductRequest>();
 		providers = new ArrayList<Provider>();
 		Provider provider  = new Provider(this, "Proveedor Jefe", 4, 1);
 		provider.addProduct(new Product("P 1", ProductType.DEHYDRATED));
@@ -162,6 +167,34 @@ public class Inventory {
 			} else {
 			}
 		}
+	}
+
+	public AutomaticProductRequest checkForProductRequest(Product p) {
+		AutomaticProductRequest apr = null;
+		for(int i = 0; i <automaticRequests.size(); i++) {
+			AutomaticProductRequest current = automaticRequests.get(i);
+			if (current.product == p) { 
+				apr = current;
+				break;
+			}
+		}
+		if (apr != null) {
+			int currentCount = countCurrentStockByProduct(p);
+			if (currentCount <= apr.amount) {
+				return apr;
+			}
+		}
+		return null;
+	}
+
+	public int countCurrentStockByProduct(Product p) {
+		int count = 0;
+		Iterator<Depot> iter = depots.iterator();
+		while(iter.hasNext()) {
+			Depot depot = iter.next();
+			count += depot.countCurrentStockByProduct(p);
+		}
+		return count;
 	}
 
 	protected void receiveInventoryInbound(InventoryInbound r) {
@@ -244,7 +277,7 @@ public class Inventory {
 		store.sendTask(outboundsProcessor, data);
 	}
 	
-	public void addAutomaticRequest(AutomaticRequest ar) {
+	public void addAutomaticRequest(AutomaticProductRequest ar) {
 		automaticRequests.add(ar);
 	}
 

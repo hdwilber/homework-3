@@ -41,5 +41,4 @@ public class InventoryRequest extends TaskRequest {
 		panel.setBackground(getPriority().getColor());
 		panel.add(label);
 	}
-	
 }

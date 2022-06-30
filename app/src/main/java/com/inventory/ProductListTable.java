@@ -225,20 +225,23 @@ public class ProductListTable extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent event) {
-		if (event.getActionCommand() == ACTION_DISPLAY_STOCK) {
-			System.out.println("DISPLAY STOCK: " + table.getSelectedRow());
+		int row = table.getSelectedRow();
+		if (row >= 0) {
 			Product product = model.getRowAt(table.getSelectedRow());
-			boolean isSet = inventory.toogleActiveProduct(product);
-			displayStockButton.setText(isSet ? "Ver Todo" : "Ver Stock");
+			if (product != null) {
+				if (event.getActionCommand() == ACTION_DISPLAY_STOCK) {
+					System.out.println("DISPLAY STOCK: " + table.getSelectedRow());
+					boolean isSet = inventory.toogleActiveProduct(product);
+					displayStockButton.setText(isSet ? "Ver Todo" : "Ver Stock");
 
-		} else if(event.getActionCommand() == ACTION_REQUEST) {
-			Product product = model.getRowAt(table.getSelectedRow());
-			manager.showEditRequestDialog(product);
-		} else if(event.getActionCommand() == ACTION_DELETE) {
-			System.out.println("DELETE: " + table.getSelectedRow());
-		} else if(event.getActionCommand() == ACTION_AUTO_REQUEST) {
-			Product product = model.getRowAt(table.getSelectedRow());
-			manager.showAutoRequestDialog(product);
+				} else if(event.getActionCommand() == ACTION_REQUEST) {
+					manager.showEditRequestDialog(product);
+				} else if(event.getActionCommand() == ACTION_DELETE) {
+					System.out.println("DELETE: " + table.getSelectedRow());
+				} else if(event.getActionCommand() == ACTION_AUTO_REQUEST) {
+					manager.showAutoRequestDialog(product);
+				}
+			}
 		}
 	}
 }

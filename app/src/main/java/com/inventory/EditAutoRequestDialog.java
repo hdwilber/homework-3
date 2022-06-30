@@ -18,23 +18,7 @@ import com.inventory.taskrequest.TaskRequestPriority;
 import com.inventory.utils.JListEnum;
 import com.inventory.utils.JListFromList;
 
-class AutomaticRequest {
-	Product product;
-	Provider provider;
-	int minumumAmount;
-	int amount;
-	TaskRequestPriority priority;
-	
-	public AutomaticRequest(Provider p, Product product, TaskRequestPriority pri, int min, int a) {
-		this.product = product;
-		provider = p;
-		minumumAmount = min;
-		amount = a;
-		priority = pri;
-	}
-}
-
-public class EditAutoRequestDialog<T> extends EditDialog<AutomaticRequest, T> implements ListSelectionListener {
+public class EditAutoRequestDialog<T> extends EditDialog<AutomaticProductRequest, T> implements ListSelectionListener {
 	List<Provider> providers;
 	List<Product> products;
 	
@@ -144,13 +128,13 @@ public class EditAutoRequestDialog<T> extends EditDialog<AutomaticRequest, T> im
 	}
 
 	@Override
-	public AutomaticRequest getData() {
+	public AutomaticProductRequest getData() {
 		Provider provider = providerList.getSelectedValue();
 		Product product = productList.getSelectedValue();
 		int amount = (int) inputAmount.getValue();
 		int minAmount = (int) inputMinAmount.getValue();
 		TaskRequestPriority priority = inputPriority.getSelectedValue();
-		return new AutomaticRequest(provider, product, priority, minAmount, amount);
+		return new AutomaticProductRequest(provider, product, priority, minAmount, amount);
 	}
 
 	@Override

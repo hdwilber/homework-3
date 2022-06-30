@@ -103,6 +103,14 @@ public class Depot extends TaskRequestProcessor {
 			return false;
 		}
 	}
+	public int countCurrentStockByProduct(Product p) {
+		int count = 0;
+		for(int i = 0; i < shelves.length; i++) {
+			Shelf shelf = shelves[i];
+			count += shelf.countCurrentStockByProduct(p);
+		}
+		return count;
+	}
 
 	public List<InventoryItem> getCurrentStockByProduct(Product p) {
 		List<InventoryItem> list = new ArrayList<InventoryItem>();

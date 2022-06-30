@@ -142,4 +142,18 @@ public class Shelf {
 		}
 		return list;
 	}
+	public int countCurrentStockByProduct(Product p) {
+		int count = 0;
+		synchronized(items) {
+			Iterator<InventoryItem> it = items.iterator();
+			while(it.hasNext()) { 
+				InventoryItem item = it.next();
+				Product product = item.order.request.getProduct();
+				if (product.getName().equals(p.getName())) {
+					count += item.amount;
+				}
+			}
+		}
+		return count;
+	}
 }
