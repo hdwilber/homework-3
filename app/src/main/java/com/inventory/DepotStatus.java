@@ -1,10 +1,12 @@
 package com.inventory;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
@@ -16,6 +18,8 @@ public class DepotStatus extends JPanel implements DepotEventListener, Inventory
 	Depot depot;
 	ShelfStatus[] shelves;
 	Product selectedProduct;
+	ItemStatus status;
+	
 	public DepotStatus(Depot d) {
 		super();
 		depot = d;
@@ -25,6 +29,14 @@ public class DepotStatus extends JPanel implements DepotEventListener, Inventory
 		setPreferredSize(new Dimension(1000, 800));
 		d.addDepotEventListener(this);
 		d.inventory.addInventoryEventListener(this);
+
+		setLayout(new BorderLayout());
+		ItemStatus status = new ItemStatus(d, null, d.getName()) {
+			private static final long serialVersionUID = 1L;
+		};
+		
+		depot.addTaskRequestEventListener(status);
+		add(status, BorderLayout.NORTH);
 	}
 
 	public void setupShelves() {

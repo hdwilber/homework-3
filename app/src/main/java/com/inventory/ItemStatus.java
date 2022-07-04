@@ -23,16 +23,20 @@ public class ItemStatus extends JPanel implements TaskRequestEventListener {
 
 	public ItemStatus(TaskRequestProcessor p, String i, String l) {
 		processor = p;
-		icon = new ImageIcon(
-				new ImageIcon(getClass().getResource(i))
-				.getImage()
-				.getScaledInstance(75, 75, java.awt.Image.SCALE_SMOOTH)
-		);
+		if (i != null) {
+			icon = new ImageIcon(
+					new ImageIcon(getClass().getResource(i))
+					.getImage()
+					.getScaledInstance(75, 75, java.awt.Image.SCALE_SMOOTH)
+			);
+		}
 
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		JLabel label = new JLabel(l);
 		setBorder(new EmptyBorder(4, 4, 4, 4));
-		label.setIcon(icon);
+		if (i != null) {
+			label.setIcon(icon);
+		}
 		label.setHorizontalTextPosition(JLabel.CENTER);
 		label.setVerticalTextPosition(JLabel.BOTTOM);
 		label.setBorder(new EmptyBorder(10, 10, 10, 10));

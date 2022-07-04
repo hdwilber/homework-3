@@ -49,7 +49,7 @@ class TaskRequestExecution implements Runnable, Comparable<TaskRequestExecution>
 					current.interrupt();
 				}
 			}
-		}, 250);
+		}, executor.getProcessingTime(request));
 		} catch(Exception e) {
 			System.out.println("EEE : " + e.getMessage());
 		}
@@ -66,7 +66,7 @@ class TaskRequestExecution implements Runnable, Comparable<TaskRequestExecution>
 						current.interrupt();
 					}
 				}
-			}, 250);
+			}, executor.getProcessingTime(request));
 		}
 		while(!Thread.currentThread().isInterrupted()){  
 			if(!suspended){  

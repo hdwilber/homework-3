@@ -1,5 +1,10 @@
 package com.inventory.taskrequest;
 
+import java.awt.Font;
+
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+
 import com.inventory.product.Product;
 
 public class InventoryOutbound extends TaskRequest {
@@ -30,9 +35,11 @@ public class InventoryOutbound extends TaskRequest {
 		return amount;
 	}
 	
-	@Override
 	public Product getProduct() {
 		return request.getProduct();
+	}
+	@Override
+	public void setContentInfo(JPanel panel, ImageIcon icon, Font font) {
 	}
 
 }

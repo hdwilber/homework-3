@@ -35,6 +35,7 @@ public class Shelf {
 		depot = d;
 		width = w;
 		height = h;
+		capacity = (int)w;
 		items = Collections.synchronizedList(new ArrayList<InventoryItem>());
 	}
 	

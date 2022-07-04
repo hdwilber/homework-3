@@ -9,20 +9,21 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.inventory.product.Product;
+import com.inventory.product.StockProduct;
 
 public class InventoryInbound extends TaskRequest {
 	public InventoryRequest request;
+	StockProduct stockProduct;
 	public int amount;
 
-	public InventoryInbound(InventoryRequest r) {
-		super(r.priority);
-		request = r;
-		amount = r.amount;
+	public InventoryInbound(InventoryRequest r, StockProduct sp) {
+		this(r, sp, r.amount);
 	}
-	public InventoryInbound(InventoryRequest r, int a) {
+	public InventoryInbound(InventoryRequest r, StockProduct sp, int a) {
 		super(r.priority);
 		request = r;
 		amount = a;
+		stockProduct = sp;
 	}
 
 	@Override
@@ -30,9 +31,12 @@ public class InventoryInbound extends TaskRequest {
 		return request.product.getName() + "(" + amount + ", " + priority + ")";
 	}
 	
-	@Override
 	public Product getProduct() {
 		return request.getProduct();
+	}
+	
+	public StockProduct getStockProduct() {
+		return stockProduct;
 	}
 
 	@Override
@@ -47,5 +51,9 @@ public class InventoryInbound extends TaskRequest {
 		label.setForeground(Color.white);
 		panel.setBackground(getPriority().getColor());
 		panel.add(label);
+	}
+
+	public long getAmount() {
+		return amount;
 	}
 }

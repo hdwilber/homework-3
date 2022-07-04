@@ -5,6 +5,7 @@ import java.util.EventListener;
 import java.util.List;
 
 import com.inventory.product.Product;
+import com.inventory.product.StockProduct;
 import com.inventory.taskrequest.InventoryInbound;
 import com.inventory.taskrequest.InventoryRequest;
 import com.inventory.taskrequest.TaskRequest;
@@ -41,7 +42,9 @@ public class Provider extends TaskRequestProcessor {
 	@Override
 	public void onTaskRequestComplete(TaskRequest r) {
 		InventoryRequest request = (InventoryRequest)r;
-		InventoryInbound inbound = new InventoryInbound(request);
+		int expiryDays = (int) Math.round(Math.random() * 300);
+		StockProduct sp = new StockProduct(request.getProduct(), expiryDays);
+		InventoryInbound inbound = new InventoryInbound(request, sp);
 		sendTask(inventory.requestsProcessor, inbound);
 	}
 

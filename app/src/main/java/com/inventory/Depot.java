@@ -20,18 +20,37 @@ interface DepotEventListener extends EventListener {
 }
 
 public class Depot extends TaskRequestProcessor {
+	@Override
+	public long getProcessingTime(TaskRequest tr) {
+		if (tr instanceof InventoryStockTransfer) {
+			return ((InventoryStockTransfer)tr).getAmount() * 500;
+		} else if (tr instanceof InventoryInbound) {
+			return ((InventoryInbound)tr).getAmount() * 500;
+		}
+		return 1000;
+	}
+
 	Shelf[] shelves;
 	double width, height;
 	Inventory inventory;
     EventListenerList listenerList = new EventListenerList();
     volatile int currentTotal;
+    String name;
+    static int counter = 1;
 
 	public Depot(Inventory i, double w, double h, int count) {
-		super(1, 1);
+		super(2, 2);
 		width = w;
 		height = h;
 		setupShelves(count);
 		inventory = i;
+
+		name = "Depósito: " +counter;
+		counter++;
+	}
+	
+	public String getName() {
+		return name;
 	}
 
 	@Override

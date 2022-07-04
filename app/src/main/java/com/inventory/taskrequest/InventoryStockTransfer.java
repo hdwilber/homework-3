@@ -1,5 +1,10 @@
 package com.inventory.taskrequest;
 
+import java.awt.Font;
+
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+
 import com.inventory.product.Product;
 
 public class InventoryStockTransfer extends TaskRequest {
@@ -26,5 +31,9 @@ public class InventoryStockTransfer extends TaskRequest {
 	
 	public int getAmount() {
 		return amount;
+	}
+
+	@Override
+	public void setContentInfo(JPanel panel, ImageIcon icon, Font font) {
 	}
 }

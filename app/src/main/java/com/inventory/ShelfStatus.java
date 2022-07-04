@@ -2,9 +2,12 @@ package com.inventory;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Iterator;
 
 import com.inventory.product.Product;
+import com.inventory.product.StockProduct;
 import com.inventory.taskrequest.TaskRequestStatus;
 
 public class ShelfStatus {
@@ -16,6 +19,7 @@ public class ShelfStatus {
 	public void drawProduct(InventoryItem item, Graphics g, int w, int h, Product p) {
 		Product currentProduct = item.order.getProduct();
 		if (p != null ? currentProduct == p : true) {
+			StockProduct stockProduct = item.order.getStockProduct();
 			g.setColor(currentProduct.getColor());
 			if (item.order.getStatus() == TaskRequestStatus.COMPLETE) {
 				g.fillRect(0, 0, w, h);
@@ -23,11 +27,15 @@ public class ShelfStatus {
 				g.drawRect(0, 0, w, h);
 			}
 			g.setColor(PathStatusItem.palette[item.order.getPriority().getValue()]);
-			g.fillOval(w - 35, h - 35, 25, 25);
+//			g.fillOval(w - 35, h - 35, 25, 25);
 			g.setColor(Color.black);
 			g.drawString(currentProduct.getName(), 25, 25);
-			g.drawOval(w - 35, h - 35, 25, 25);
-			g.drawString(item.order.getPriority().getValue() + "", w-25, h-15);
+//			g.drawOval(w - 35, h - 35, 25, 25);
+//			g.drawString(item.order.getPriority().getValue() + "", w-25, h-15);
+			
+			DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+			g.drawString("Exp.: " + formatter.format(stockProduct.getExpiryDate()), 15, h -15);
+			
 		} else {
 			g.setColor(Color.LIGHT_GRAY);
 			g.fillRect(0, 0, w, h);

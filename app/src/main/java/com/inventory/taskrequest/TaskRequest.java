@@ -1,25 +1,18 @@
 package com.inventory.taskrequest;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.util.Date;
 
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.inventory.product.Product;
-
-public class TaskRequest implements Comparable<TaskRequest>{
+public abstract class TaskRequest implements Comparable<TaskRequest>{
 
 	static int count = 1;
 	int id;
 	protected TaskRequestPriority priority;
 	protected TaskRequestStatus status;
 	protected Date creation_date;
-	protected Product product;
-	int amount;
 	
 	public TaskRequest() {
 		this(TaskRequestPriority.NONE);
@@ -60,16 +53,5 @@ public class TaskRequest implements Comparable<TaskRequest>{
 		return "TaskRequest ["+priority+"] #" + id;
 	}
 
-	public Product getProduct() {
-		return product;
-	}
-	
-	public int getAmount() {
-		return amount;
-	}
-
-	public void setContentInfo(JPanel panel, ImageIcon icon, Font font) {
-		
-	}
-
+	public abstract void setContentInfo(JPanel panel, ImageIcon icon, Font font);
 }

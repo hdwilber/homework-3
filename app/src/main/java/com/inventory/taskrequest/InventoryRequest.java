@@ -28,7 +28,11 @@ public class InventoryRequest extends TaskRequest {
 	public Product getProduct() {
 		return product;
 	}
-	@Override
+	
+	public int getAmount() {
+		return amount;
+	}
+
 	public void setContentInfo(JPanel panel, ImageIcon icon, Font font) {
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 		JLabel label = new JLabel(icon);

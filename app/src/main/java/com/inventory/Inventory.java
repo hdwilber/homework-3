@@ -34,13 +34,19 @@ public class Inventory {
 	EventListenerList listenerList = new EventListenerList();
 	EventListenerList storeListenerList = new EventListenerList();
 
-	public TaskRequestProcessor requestsProcessor = new TaskRequestProcessor(1, 1) {
+	public TaskRequestProcessor requestsProcessor = new TaskRequestProcessor(2, 2) {
 		public long getProcessingTime(TaskRequest io) {
-			InventoryRequest ir = (InventoryRequest)io;
-			long time = ((long)(Math.random() * 1000)) * ir.getAmount();
-//			long time = 200;
+			if (io instanceof InventoryRequest) {
+				InventoryRequest ir = (InventoryRequest)io;
+				return ((long)(Math.random() * 250)) * ir.getAmount();
+			} else if (io instanceof InventoryInbound){
+				InventoryInbound ib = (InventoryInbound)io;
+				return ((long)(Math.random() * 250)) * ib.getAmount();
+			}
+			long time = 500;
 			return time;
 		}
+
 		@Override
 		public void onTaskRequestComplete(TaskRequest r) {
 			if (r instanceof InventoryRequest) { 
@@ -56,11 +62,16 @@ public class Inventory {
 		}
 	};
 
-	public TaskRequestProcessor outboundsProcessor = new TaskRequestProcessor(1, 1) {
+	public TaskRequestProcessor outboundsProcessor = new TaskRequestProcessor(2, 2) {
 		public long getProcessingTime(TaskRequest io) {
-			InventoryStockTransfer ir = (InventoryStockTransfer)io;
-			long time = ((long)(Math.random() * 1000)) * ir.getAmount();
-//			long time = 200;
+			if (io instanceof InventoryStockTransfer) {
+				InventoryStockTransfer ir = (InventoryStockTransfer)io;
+				return ((long)(Math.random() * 1000)) * ir.getAmount();
+			} else if (io instanceof InventoryOutbound) {
+				InventoryOutbound ib = (InventoryOutbound)io;
+				return ((long)(Math.random() * 1000)) * ib.getAmount();
+			}
+			long time = 500;
 			return time;
 		}
 		@Override
@@ -83,8 +94,10 @@ public class Inventory {
 	public Inventory() {
 		super();
 		depots = new ArrayList<Depot>();
-		depots.add(new Depot(this, 10, 10, 5));
-		depots.add(new Depot(this, 20, 10, 5));
+		depots.add(new Depot(this, 5, 5, 4));
+		depots.add(new Depot(this, 5, 5, 4));
+		depots.add(new Depot(this, 15, 10, 5));
+		depots.add(new Depot(this, 5, 5, 4));
 		depots.add(new Depot(this, 15, 10, 5));
 		store = new Store(this, 3, 3);
 		automaticRequests = new ArrayList<AutomaticProductRequest>();
