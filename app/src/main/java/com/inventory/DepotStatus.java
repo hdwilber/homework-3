@@ -9,6 +9,9 @@ import java.awt.Image;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 
 import com.inventory.product.Product;
 
@@ -34,7 +37,7 @@ public class DepotStatus extends JPanel implements DepotEventListener, Inventory
 		ItemStatus status = new ItemStatus(d, null, d.getName()) {
 			private static final long serialVersionUID = 1L;
 		};
-		
+		status.setOpaque(false);
 		depot.addTaskRequestEventListener(status);
 		add(status, BorderLayout.NORTH);
 	}
